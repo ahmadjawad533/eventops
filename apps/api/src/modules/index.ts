@@ -11,6 +11,8 @@ import { sponsorshipRoutes } from './sponsorship/sponsorship.routes';
 import { venuesRoutes } from './venues/venues.routes';
 import { notificationsRoutes } from './notifications/notifications.routes';
 
+import { eventsController } from './events/events.controller';
+
 const apiRouter = Router();
 
 apiRouter.use('/health', healthRoutes);
@@ -19,6 +21,7 @@ apiRouter.use('/users', usersRoutes);
 apiRouter.use('/organizations', organizationsRoutes);
 apiRouter.use('/communities', communitiesRoutes);
 apiRouter.use('/events', eventsRoutes);
+apiRouter.get('/certificates/verify/:verificationId', eventsController.verifyCertificate);
 apiRouter.use('/collaboration', collaborationRoutes);
 apiRouter.use('/outreach', outreachRoutes);
 apiRouter.use('/sponsorship', sponsorshipRoutes);

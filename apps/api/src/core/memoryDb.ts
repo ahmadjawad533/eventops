@@ -1,5 +1,13 @@
 import crypto from 'crypto';
-import { RoleType, OrganizationType, OrgMemberRole } from '@eventops/shared-types';
+import {
+  RoleType,
+  OrganizationType,
+  OrgMemberRole,
+  EventCategory,
+  EventFormat,
+  EventStatus,
+  RegistrationStatus,
+} from '@eventops/shared-types';
 
 export interface DbUser {
   id: string;
@@ -46,6 +54,39 @@ export interface DbCommunityFollower {
   followed_at: Date;
 }
 
+export interface DbEvent {
+  id: string;
+  organizer_org_id: string;
+  title: string;
+  description: string;
+  category: EventCategory;
+  format: EventFormat;
+  start_date: Date;
+  end_date: Date;
+  location?: string | null;
+  capacity: number;
+  status: EventStatus;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DbEventRegistration {
+  id: string;
+  event_id: string;
+  user_id: string;
+  ticket_code: string;
+  status: RegistrationStatus;
+  registered_at: Date;
+  checked_in_at?: Date | null;
+}
+
+export interface DbCertificate {
+  id: string;
+  registration_id: string;
+  verification_id: string;
+  issued_at: Date;
+}
+
 export interface DbAuditLog {
   id: string;
   actor_user_id?: string | null;
@@ -62,6 +103,9 @@ class MemoryDatabase {
   public organizations: Map<string, DbOrganization> = new Map();
   public members: Map<string, DbOrgMember> = new Map();
   public followers: Map<string, DbCommunityFollower> = new Map();
+  public events: Map<string, DbEvent> = new Map();
+  public registrations: Map<string, DbEventRegistration> = new Map();
+  public certificates: Map<string, DbCertificate> = new Map();
   public auditLogs: DbAuditLog[] = [];
 
   public clear() {
@@ -70,6 +114,9 @@ class MemoryDatabase {
     this.organizations.clear();
     this.members.clear();
     this.followers.clear();
+    this.events.clear();
+    this.registrations.clear();
+    this.certificates.clear();
     this.auditLogs = [];
   }
 
@@ -318,6 +365,209 @@ class MemoryDatabase {
       if (f.community_org_id === community_org_id) count++;
     }
     return count;
+  }
+
+  // --- Events ---
+  public createEvent(data: {
+    organizer_org_id: string;
+    title: string;
+    description: string;
+    category: EventCategory;
+    format: EventFormat;
+    start_date: Date;
+    end_date: Date;
+    location?: string | null;
+    capacity: number;
+    status?: EventStatus;
+  }): DbEvent {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const event: DbEvent = {
+      id,
+      organizer_org_id: data.organizer_org_id,
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      format: data.format,
+      start_date: data.start_date,
+      end_date: data.end_date,
+      location: data.location || null,
+      capacity: data.capacity,
+      status: data.status || EventStatus.DRAFT,
+      created_at: now,
+      updated_at: now,
+    };
+    this.events.set(id, event);
+    return event;
+  }
+
+  public findEventById(id: string): DbEvent | null {
+    return this.events.get(id) || null;
+  }
+
+  public updateEvent(id: string, updates: Partial<DbEvent>): DbEvent | null {
+    const event = this.events.get(id);
+    if (!event) return null;
+    const updated: DbEvent = {
+      ...event,
+      ...updates,
+      updated_at: new Date(),
+    };
+    this.events.set(id, updated);
+    return updated;
+  }
+
+  public findEvents(filter?: {
+    category?: EventCategory;
+    format?: EventFormat;
+    status?: EventStatus;
+    location?: string;
+    organizer_org_id?: string;
+    startDate?: Date;
+    endDate?: Date;
+    search?: string;
+    skip?: number;
+    take?: number;
+  }) {
+    let list = Array.from(this.events.values());
+
+    if (filter?.category) list = list.filter((e) => e.category === filter.category);
+    if (filter?.format) list = list.filter((e) => e.format === filter.format);
+    if (filter?.status) list = list.filter((e) => e.status === filter.status);
+    if (filter?.organizer_org_id) list = list.filter((e) => e.organizer_org_id === filter.organizer_org_id);
+    if (filter?.location) {
+      const loc = filter.location.toLowerCase();
+      list = list.filter((e) => e.location && e.location.toLowerCase().includes(loc));
+    }
+    if (filter?.startDate) list = list.filter((e) => e.start_date >= filter.startDate!);
+    if (filter?.endDate) list = list.filter((e) => e.end_date <= filter.endDate!);
+    if (filter?.search) {
+      const q = filter.search.toLowerCase();
+      list = list.filter(
+        (e) => e.title.toLowerCase().includes(q) || e.description.toLowerCase().includes(q)
+      );
+    }
+
+    list.sort((a, b) => a.start_date.getTime() - b.start_date.getTime());
+    const total = list.length;
+    const skip = filter?.skip || 0;
+    const take = filter?.take || 10;
+    return {
+      items: list.slice(skip, skip + take),
+      total,
+    };
+  }
+
+  // --- Event Registrations ---
+  public createRegistration(data: {
+    event_id: string;
+    user_id: string;
+    ticket_code: string;
+    status?: RegistrationStatus;
+  }): DbEventRegistration {
+    const id = crypto.randomUUID();
+    const reg: DbEventRegistration = {
+      id,
+      event_id: data.event_id,
+      user_id: data.user_id,
+      ticket_code: data.ticket_code,
+      status: data.status || RegistrationStatus.REGISTERED,
+      registered_at: new Date(),
+      checked_in_at: null,
+    };
+    this.registrations.set(id, reg);
+    return reg;
+  }
+
+  public findRegistrationById(id: string): DbEventRegistration | null {
+    return this.registrations.get(id) || null;
+  }
+
+  public findRegistrationByTicketCode(ticketCode: string): DbEventRegistration | null {
+    for (const r of this.registrations.values()) {
+      if (r.ticket_code === ticketCode) return r;
+    }
+    return null;
+  }
+
+  public findRegistration(eventId: string, userId: string): DbEventRegistration | null {
+    for (const r of this.registrations.values()) {
+      if (r.event_id === eventId && r.user_id === userId) return r;
+    }
+    return null;
+  }
+
+  public countRegistrations(eventId: string): number {
+    let count = 0;
+    for (const r of this.registrations.values()) {
+      if (r.event_id === eventId) count++;
+    }
+    return count;
+  }
+
+  public updateRegistration(id: string, updates: Partial<DbEventRegistration>): DbEventRegistration | null {
+    const reg = this.registrations.get(id);
+    if (!reg) return null;
+    const updated: DbEventRegistration = {
+      ...reg,
+      ...updates,
+    };
+    this.registrations.set(id, updated);
+    return updated;
+  }
+
+  public getEventRegistrations(eventId: string, skip = 0, take = 10) {
+    const list: DbEventRegistration[] = [];
+    for (const r of this.registrations.values()) {
+      if (r.event_id === eventId) list.push(r);
+    }
+    list.sort((a, b) => b.registered_at.getTime() - a.registered_at.getTime());
+    return {
+      items: list.slice(skip, skip + take),
+      total: list.length,
+    };
+  }
+
+  public getUserRegistrations(userId: string, skip = 0, take = 10) {
+    const list: DbEventRegistration[] = [];
+    for (const r of this.registrations.values()) {
+      if (r.user_id === userId) list.push(r);
+    }
+    list.sort((a, b) => b.registered_at.getTime() - a.registered_at.getTime());
+    return {
+      items: list.slice(skip, skip + take),
+      total: list.length,
+    };
+  }
+
+  // --- Certificates ---
+  public createCertificate(data: {
+    registration_id: string;
+    verification_id: string;
+  }): DbCertificate {
+    const id = crypto.randomUUID();
+    const cert: DbCertificate = {
+      id,
+      registration_id: data.registration_id,
+      verification_id: data.verification_id,
+      issued_at: new Date(),
+    };
+    this.certificates.set(id, cert);
+    return cert;
+  }
+
+  public findCertificateByRegistrationId(registrationId: string): DbCertificate | null {
+    for (const c of this.certificates.values()) {
+      if (c.registration_id === registrationId) return c;
+    }
+    return null;
+  }
+
+  public findCertificateByVerificationId(verificationId: string): DbCertificate | null {
+    for (const c of this.certificates.values()) {
+      if (c.verification_id.toLowerCase() === verificationId.toLowerCase()) return c;
+    }
+    return null;
   }
 
   // --- Audit Logs ---

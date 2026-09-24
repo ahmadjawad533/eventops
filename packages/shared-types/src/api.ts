@@ -1,5 +1,12 @@
 import { UserProfile, UserRole } from './models';
-import { RoleType, OrganizationType } from './enums';
+import {
+  RoleType,
+  OrganizationType,
+  EventCategory,
+  EventFormat,
+  EventStatus,
+  RegistrationStatus,
+} from './enums';
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -93,4 +100,49 @@ export interface TicketPayload {
   eventId: string;
   userId: string;
   signature: string;
+}
+
+export interface CreateEventDto {
+  organizer_org_id: string;
+  title: string;
+  description: string;
+  category: EventCategory;
+  format: EventFormat;
+  start_date: string;
+  end_date: string;
+  location?: string;
+  capacity: number;
+}
+
+export interface UpdateEventDto {
+  title?: string;
+  description?: string;
+  category?: EventCategory;
+  format?: EventFormat;
+  start_date?: string;
+  end_date?: string;
+  location?: string;
+  capacity?: number;
+  status?: EventStatus;
+}
+
+export interface CheckInDto {
+  qrPayload?: string;
+  ticketCode?: string;
+  targetStatus?: RegistrationStatus;
+}
+
+export interface CertificateVerification {
+  valid: boolean;
+  message?: string;
+  certificate?: {
+    verification_id: string;
+    issued_at: string;
+    attendee_name: string;
+    attendee_email: string;
+    event_title: string;
+    event_date: string;
+    event_location?: string | null;
+    organizer_name: string;
+  };
 }
