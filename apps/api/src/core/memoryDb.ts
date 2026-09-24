@@ -9,6 +9,7 @@ import {
   RegistrationStatus,
   CollaborationType,
   CollaborationStatus,
+  OutreachStatus,
 } from '@eventops/shared-types';
 
 export interface DbUser {
@@ -120,6 +121,35 @@ export interface DbCollaborationTask {
   updated_at: Date;
 }
 
+export interface DbOutreachRequest {
+  id: string;
+  requesting_org_id: string;
+  target_community_org_id: string;
+  event_id: string;
+  purpose: string;
+  target_audience: string;
+  requested_recipient_count: number;
+  message_subject: string;
+  message_body: string;
+  status: OutreachStatus;
+  reviewed_by_user_id?: string | null;
+  reviewed_at?: Date | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DbOutreachCampaign {
+  id: string;
+  outreach_request_id: string;
+  sent_count: number;
+  delivered_count: number;
+  opened_count: number;
+  clicked_count: number;
+  registrations_count: number;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface DbAuditLog {
   id: string;
   actor_user_id?: string | null;
@@ -142,6 +172,8 @@ class MemoryDatabase {
   public collaborations: Map<string, DbCollaboration> = new Map();
   public collaborationMessages: Map<string, DbCollaborationMessage> = new Map();
   public collaborationTasks: Map<string, DbCollaborationTask> = new Map();
+  public outreachRequests: Map<string, DbOutreachRequest> = new Map();
+  public outreachCampaigns: Map<string, DbOutreachCampaign> = new Map();
   public auditLogs: DbAuditLog[] = [];
 
   public clear() {
@@ -156,6 +188,8 @@ class MemoryDatabase {
     this.collaborations.clear();
     this.collaborationMessages.clear();
     this.collaborationTasks.clear();
+    this.outreachRequests.clear();
+    this.outreachCampaigns.clear();
     this.auditLogs = [];
   }
 
@@ -768,6 +802,144 @@ class MemoryDatabase {
     }
     list.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
     return list;
+  }
+
+  // --- Outreach Requests ---
+  public createOutreachRequest(data: {
+    requesting_org_id: string;
+    target_community_org_id: string;
+    event_id: string;
+    purpose: string;
+    target_audience: string;
+    requested_recipient_count: number;
+    message_subject: string;
+    message_body: string;
+    status?: OutreachStatus;
+  }): DbOutreachRequest {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const req: DbOutreachRequest = {
+      id,
+      requesting_org_id: data.requesting_org_id,
+      target_community_org_id: data.target_community_org_id,
+      event_id: data.event_id,
+      purpose: data.purpose,
+      target_audience: data.target_audience,
+      requested_recipient_count: data.requested_recipient_count,
+      message_subject: data.message_subject,
+      message_body: data.message_body,
+      status: data.status || OutreachStatus.PENDING,
+      reviewed_by_user_id: null,
+      reviewed_at: null,
+      created_at: now,
+      updated_at: now,
+    };
+    this.outreachRequests.set(id, req);
+    return req;
+  }
+
+  public findOutreachRequestById(id: string): DbOutreachRequest | null {
+    return this.outreachRequests.get(id) || null;
+  }
+
+  public updateOutreachRequest(id: string, updates: Partial<DbOutreachRequest>): DbOutreachRequest | null {
+    const req = this.outreachRequests.get(id);
+    if (!req) return null;
+    const updated: DbOutreachRequest = {
+      ...req,
+      ...updates,
+      updated_at: new Date(),
+    };
+    this.outreachRequests.set(id, updated);
+    return updated;
+  }
+
+  public findOutreachRequests(filter?: {
+    requesting_org_id?: string;
+    target_community_org_id?: string;
+    event_id?: string;
+    status?: OutreachStatus;
+    skip?: number;
+    take?: number;
+  }) {
+    let list = Array.from(this.outreachRequests.values());
+
+    if (filter?.requesting_org_id) {
+      list = list.filter((r) => r.requesting_org_id === filter.requesting_org_id);
+    }
+    if (filter?.target_community_org_id) {
+      list = list.filter((r) => r.target_community_org_id === filter.target_community_org_id);
+    }
+    if (filter?.event_id) {
+      list = list.filter((r) => r.event_id === filter.event_id);
+    }
+    if (filter?.status) {
+      list = list.filter((r) => r.status === filter.status);
+    }
+
+    list.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+    const total = list.length;
+    const skip = filter?.skip || 0;
+    const take = filter?.take || 10;
+    return {
+      items: list.slice(skip, skip + take),
+      total,
+    };
+  }
+
+  public countDailyOutreachRequests(requesting_org_id: string, sinceDate: Date): number {
+    let count = 0;
+    for (const r of this.outreachRequests.values()) {
+      if (r.requesting_org_id === requesting_org_id && r.created_at >= sinceDate) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  // --- Outreach Campaigns ---
+  public createOutreachCampaign(data: {
+    outreach_request_id: string;
+    sent_count?: number;
+    delivered_count?: number;
+    opened_count?: number;
+    clicked_count?: number;
+    registrations_count?: number;
+  }): DbOutreachCampaign {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const campaign: DbOutreachCampaign = {
+      id,
+      outreach_request_id: data.outreach_request_id,
+      sent_count: data.sent_count || 0,
+      delivered_count: data.delivered_count || 0,
+      opened_count: data.opened_count || 0,
+      clicked_count: data.clicked_count || 0,
+      registrations_count: data.registrations_count || 0,
+      created_at: now,
+      updated_at: now,
+    };
+    this.outreachCampaigns.set(data.outreach_request_id, campaign);
+    return campaign;
+  }
+
+  public findOutreachCampaignByRequestId(requestId: string): DbOutreachCampaign | null {
+    return this.outreachCampaigns.get(requestId) || null;
+  }
+
+  public updateOutreachCampaign(
+    requestId: string,
+    updates: Partial<DbOutreachCampaign>
+  ): DbOutreachCampaign | null {
+    const c = this.outreachCampaigns.get(requestId);
+    if (!c) return null;
+    const updated: DbOutreachCampaign = {
+      ...c,
+      ...updates,
+      updated_at: new Date(),
+    };
+    this.outreachCampaigns.set(requestId, updated);
+    return updated;
   }
 
   // --- Audit Logs ---

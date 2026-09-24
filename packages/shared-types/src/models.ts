@@ -146,6 +146,7 @@ export interface OutreachRequest {
   event?: Event;
   requesting_org?: Organization;
   target_community?: Organization;
+  campaign?: OutreachCampaign;
 }
 
 export interface OutreachCampaign {

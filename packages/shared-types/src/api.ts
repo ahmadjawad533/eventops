@@ -186,3 +186,27 @@ export interface CollaborationWorkspaceResponse {
   tasks: CollaborationTask[];
   messages: CollaborationMessage[];
 }
+
+export interface CreateOutreachRequestDto {
+  requesting_org_id: string;
+  target_community_org_id: string;
+  event_id: string;
+  purpose: string;
+  target_audience: string;
+  requested_recipient_count: number;
+  message_subject: string;
+  message_body: string;
+}
+
+export interface ReviewOutreachRequestDto {
+  action: 'approve' | 'approve_with_edits' | 'reject' | 'needs_info';
+  message_subject?: string;
+  message_body?: string;
+  notes?: string;
+}
+
+export interface SimulateActivityDto {
+  opens?: number;
+  clicks?: number;
+  registrations?: number;
+}

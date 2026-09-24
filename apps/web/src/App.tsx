@@ -13,6 +13,7 @@ import {
   CertificateVerification,
 } from '@eventops/shared-types';
 import { CollaborationTab } from './components/CollaborationTab';
+import { OutreachTab } from './components/OutreachTab';
 
 interface HealthStatus {
   status: string;
@@ -57,7 +58,7 @@ export function App() {
   const [roles, setRoles] = useState<UserRole[]>([]);
 
   // Navigation tab
-  const [activeTab, setActiveTab] = useState<'events' | 'organizations' | 'certificates' | 'profile' | 'collaborations'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'organizations' | 'certificates' | 'profile' | 'collaborations' | 'outreach'>('events');
 
   // Auth Form state
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -799,6 +800,16 @@ export function App() {
                 Collaborations
               </button>
               <button
+                onClick={() => setActiveTab('outreach')}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${
+                  activeTab === 'outreach'
+                    ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                Outreach (Permission-Based)
+              </button>
+              <button
                 onClick={() => setActiveTab('certificates')}
                 className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${
                   activeTab === 'certificates'
@@ -1264,6 +1275,18 @@ export function App() {
             {/* TAB: COLLABORATION MARKETPLACE & WORKSPACES */}
             {activeTab === 'collaborations' && (
               <CollaborationTab
+                token={token}
+                user={user}
+                roles={roles}
+                orgs={orgs}
+                events={events}
+                onActionMsg={(msg) => setEventActionMsg(msg)}
+              />
+            )}
+
+            {/* TAB: PERMISSION-BASED OUTREACH & CAMPAIGNS */}
+            {activeTab === 'outreach' && (
+              <OutreachTab
                 token={token}
                 user={user}
                 roles={roles}
