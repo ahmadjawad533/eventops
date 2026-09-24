@@ -198,6 +198,7 @@ export interface VenueRequest {
   event_id: string;
   requesting_org_id: string;
   status: VenueRequestStatus;
+  notes?: string | null;
   created_at: string;
   venue?: Venue;
   event?: Event;

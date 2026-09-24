@@ -14,6 +14,8 @@ import {
 } from '@eventops/shared-types';
 import { CollaborationTab } from './components/CollaborationTab';
 import { OutreachTab } from './components/OutreachTab';
+import { SponsorshipTab } from './components/SponsorshipTab';
+import { VenuesTab } from './components/VenuesTab';
 
 interface HealthStatus {
   status: string;
@@ -58,7 +60,7 @@ export function App() {
   const [roles, setRoles] = useState<UserRole[]>([]);
 
   // Navigation tab
-  const [activeTab, setActiveTab] = useState<'events' | 'organizations' | 'certificates' | 'profile' | 'collaborations' | 'outreach'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'organizations' | 'certificates' | 'profile' | 'collaborations' | 'outreach' | 'sponsorships' | 'venues'>('events');
 
   // Auth Form state
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -810,6 +812,26 @@ export function App() {
                 Outreach (Permission-Based)
               </button>
               <button
+                onClick={() => setActiveTab('sponsorships')}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${
+                  activeTab === 'sponsorships'
+                    ? 'bg-emerald-600/20 text-emerald-400 border border-emerald-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                💼 Sponsorships &amp; CRM
+              </button>
+              <button
+                onClick={() => setActiveTab('venues')}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${
+                  activeTab === 'venues'
+                    ? 'bg-blue-600/20 text-blue-400 border border-blue-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                🏛️ Venues &amp; Bookings
+              </button>
+              <button
                 onClick={() => setActiveTab('certificates')}
                 className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${
                   activeTab === 'certificates'
@@ -1293,6 +1315,26 @@ export function App() {
                 orgs={orgs}
                 events={events}
                 onActionMsg={(msg) => setEventActionMsg(msg)}
+              />
+            )}
+
+            {/* TAB: SPONSORSHIPS MARKETPLACE & CRM */}
+            {activeTab === 'sponsorships' && (
+              <SponsorshipTab
+                token={token}
+                userOrgs={orgs}
+                userEvents={events}
+                roles={roles}
+              />
+            )}
+
+            {/* TAB: VENUES MARKETPLACE & BOOKING REQUESTS */}
+            {activeTab === 'venues' && (
+              <VenuesTab
+                token={token}
+                userOrgs={orgs}
+                userEvents={events}
+                roles={roles}
               />
             )}
           </div>

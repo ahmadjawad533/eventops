@@ -10,6 +10,8 @@ import {
   CollaborationType,
   CollaborationStatus,
   OutreachStatus,
+  SponsorshipStatus,
+  VenueRequestStatus,
 } from '@eventops/shared-types';
 
 export interface DbUser {
@@ -150,6 +152,48 @@ export interface DbOutreachCampaign {
   updated_at: Date;
 }
 
+export interface DbSponsorshipOpportunity {
+  id: string;
+  event_id: string;
+  title: string;
+  needs: Record<string, any>;
+  budget_range?: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DbSponsorshipApplication {
+  id: string;
+  opportunity_id: string;
+  sponsor_org_id: string;
+  status: SponsorshipStatus;
+  notes?: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DbVenue {
+  id: string;
+  owner_org_id: string;
+  name: string;
+  capacity: number;
+  facilities: Record<string, any>;
+  city: string;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DbVenueRequest {
+  id: string;
+  venue_id: string;
+  event_id: string;
+  requesting_org_id: string;
+  status: VenueRequestStatus;
+  notes?: string | null;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface DbAuditLog {
   id: string;
   actor_user_id?: string | null;
@@ -174,6 +218,10 @@ class MemoryDatabase {
   public collaborationTasks: Map<string, DbCollaborationTask> = new Map();
   public outreachRequests: Map<string, DbOutreachRequest> = new Map();
   public outreachCampaigns: Map<string, DbOutreachCampaign> = new Map();
+  public sponsorshipOpportunities: Map<string, DbSponsorshipOpportunity> = new Map();
+  public sponsorshipApplications: Map<string, DbSponsorshipApplication> = new Map();
+  public venues: Map<string, DbVenue> = new Map();
+  public venueRequests: Map<string, DbVenueRequest> = new Map();
   public auditLogs: DbAuditLog[] = [];
 
   public clear() {
@@ -190,6 +238,10 @@ class MemoryDatabase {
     this.collaborationTasks.clear();
     this.outreachRequests.clear();
     this.outreachCampaigns.clear();
+    this.sponsorshipOpportunities.clear();
+    this.sponsorshipApplications.clear();
+    this.venues.clear();
+    this.venueRequests.clear();
     this.auditLogs = [];
   }
 
@@ -939,6 +991,314 @@ class MemoryDatabase {
       updated_at: new Date(),
     };
     this.outreachCampaigns.set(requestId, updated);
+    return updated;
+  }
+
+  // --- Sponsorship Opportunities ---
+  public createSponsorshipOpportunity(data: {
+    event_id: string;
+    title: string;
+    needs: Record<string, any>;
+    budget_range?: string | null;
+  }): DbSponsorshipOpportunity {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const opp: DbSponsorshipOpportunity = {
+      id,
+      event_id: data.event_id,
+      title: data.title,
+      needs: data.needs,
+      budget_range: data.budget_range || null,
+      created_at: now,
+      updated_at: now,
+    };
+    this.sponsorshipOpportunities.set(id, opp);
+    return opp;
+  }
+
+  public findSponsorshipOpportunityById(id: string): DbSponsorshipOpportunity | null {
+    return this.sponsorshipOpportunities.get(id) || null;
+  }
+
+  public findSponsorshipOpportunitiesPaginated(filter?: {
+    event_id?: string;
+    search?: string;
+    budget_range?: string;
+    skip?: number;
+    take?: number;
+  }): { items: DbSponsorshipOpportunity[]; total: number } {
+    let list = Array.from(this.sponsorshipOpportunities.values());
+
+    if (filter?.event_id) {
+      list = list.filter((o) => o.event_id === filter.event_id);
+    }
+    if (filter?.search) {
+      const q = filter.search.toLowerCase();
+      list = list.filter((o) => o.title.toLowerCase().includes(q));
+    }
+    if (filter?.budget_range) {
+      list = list.filter((o) => o.budget_range === filter.budget_range);
+    }
+
+    list.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+    const total = list.length;
+    const skip = filter?.skip || 0;
+    const take = filter?.take || 10;
+    return {
+      items: list.slice(skip, skip + take),
+      total,
+    };
+  }
+
+  // --- Sponsorship Applications ---
+  public createSponsorshipApplication(data: {
+    opportunity_id: string;
+    sponsor_org_id: string;
+    status?: SponsorshipStatus;
+    notes?: string | null;
+  }): DbSponsorshipApplication {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const app: DbSponsorshipApplication = {
+      id,
+      opportunity_id: data.opportunity_id,
+      sponsor_org_id: data.sponsor_org_id,
+      status: data.status || SponsorshipStatus.POTENTIAL,
+      notes: data.notes || null,
+      created_at: now,
+      updated_at: now,
+    };
+    this.sponsorshipApplications.set(id, app);
+    return app;
+  }
+
+  public findSponsorshipApplicationById(id: string): DbSponsorshipApplication | null {
+    return this.sponsorshipApplications.get(id) || null;
+  }
+
+  public findExistingSponsorshipApplication(
+    opportunity_id: string,
+    sponsor_org_id: string
+  ): DbSponsorshipApplication | null {
+    for (const app of this.sponsorshipApplications.values()) {
+      if (app.opportunity_id === opportunity_id && app.sponsor_org_id === sponsor_org_id) {
+        return app;
+      }
+    }
+    return null;
+  }
+
+  public findSponsorshipApplicationsPaginated(filter?: {
+    opportunity_id?: string;
+    sponsor_org_id?: string;
+    status?: SponsorshipStatus;
+    skip?: number;
+    take?: number;
+  }): { items: DbSponsorshipApplication[]; total: number } {
+    let list = Array.from(this.sponsorshipApplications.values());
+
+    if (filter?.opportunity_id) {
+      list = list.filter((a) => a.opportunity_id === filter.opportunity_id);
+    }
+    if (filter?.sponsor_org_id) {
+      list = list.filter((a) => a.sponsor_org_id === filter.sponsor_org_id);
+    }
+    if (filter?.status) {
+      list = list.filter((a) => a.status === filter.status);
+    }
+
+    list.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+    const total = list.length;
+    const skip = filter?.skip || 0;
+    const take = filter?.take || 10;
+    return {
+      items: list.slice(skip, skip + take),
+      total,
+    };
+  }
+
+  public updateSponsorshipApplication(
+    id: string,
+    updates: Partial<DbSponsorshipApplication>
+  ): DbSponsorshipApplication | null {
+    const app = this.sponsorshipApplications.get(id);
+    if (!app) return null;
+    const updated: DbSponsorshipApplication = {
+      ...app,
+      ...updates,
+      updated_at: new Date(),
+    };
+    this.sponsorshipApplications.set(id, updated);
+    return updated;
+  }
+
+  // --- Venues ---
+  public createVenue(data: {
+    owner_org_id: string;
+    name: string;
+    capacity: number;
+    facilities: Record<string, any>;
+    city: string;
+  }): DbVenue {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const venue: DbVenue = {
+      id,
+      owner_org_id: data.owner_org_id,
+      name: data.name,
+      capacity: data.capacity,
+      facilities: data.facilities,
+      city: data.city,
+      created_at: now,
+      updated_at: now,
+    };
+    this.venues.set(id, venue);
+    return venue;
+  }
+
+  public findVenueById(id: string): DbVenue | null {
+    return this.venues.get(id) || null;
+  }
+
+  public findVenuesPaginated(filter?: {
+    city?: string;
+    min_capacity?: number;
+    max_capacity?: number;
+    facility?: string;
+    owner_org_id?: string;
+    search?: string;
+    skip?: number;
+    take?: number;
+  }): { items: DbVenue[]; total: number } {
+    let list = Array.from(this.venues.values());
+
+    if (filter?.city) {
+      const c = filter.city.toLowerCase();
+      list = list.filter((v) => v.city.toLowerCase().includes(c));
+    }
+    if (filter?.min_capacity !== undefined) {
+      list = list.filter((v) => v.capacity >= filter.min_capacity!);
+    }
+    if (filter?.max_capacity !== undefined) {
+      list = list.filter((v) => v.capacity <= filter.max_capacity!);
+    }
+    if (filter?.facility) {
+      const fac = filter.facility.toLowerCase();
+      list = list.filter((v) => {
+        if (!v.facilities || typeof v.facilities !== 'object') return false;
+        return Boolean((v.facilities as any)[fac]);
+      });
+    }
+    if (filter?.owner_org_id) {
+      list = list.filter((v) => v.owner_org_id === filter.owner_org_id);
+    }
+    if (filter?.search) {
+      const q = filter.search.toLowerCase();
+      list = list.filter((v) => v.name.toLowerCase().includes(q) || v.city.toLowerCase().includes(q));
+    }
+
+    list.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+    const total = list.length;
+    const skip = filter?.skip || 0;
+    const take = filter?.take || 10;
+    return {
+      items: list.slice(skip, skip + take),
+      total,
+    };
+  }
+
+  public updateVenue(id: string, updates: Partial<DbVenue>): DbVenue | null {
+    const v = this.venues.get(id);
+    if (!v) return null;
+    const updated: DbVenue = {
+      ...v,
+      ...updates,
+      updated_at: new Date(),
+    };
+    this.venues.set(id, updated);
+    return updated;
+  }
+
+  // --- Venue Requests ---
+  public createVenueRequest(data: {
+    venue_id: string;
+    event_id: string;
+    requesting_org_id: string;
+    status?: VenueRequestStatus;
+    notes?: string | null;
+  }): DbVenueRequest {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const req: DbVenueRequest = {
+      id,
+      venue_id: data.venue_id,
+      event_id: data.event_id,
+      requesting_org_id: data.requesting_org_id,
+      status: data.status || VenueRequestStatus.REQUESTED,
+      notes: data.notes || null,
+      created_at: now,
+      updated_at: now,
+    };
+    this.venueRequests.set(id, req);
+    return req;
+  }
+
+  public findVenueRequestById(id: string): DbVenueRequest | null {
+    return this.venueRequests.get(id) || null;
+  }
+
+  public findVenueRequestsPaginated(filter?: {
+    venue_id?: string;
+    event_id?: string;
+    requesting_org_id?: string;
+    owner_org_id?: string;
+    status?: VenueRequestStatus;
+    skip?: number;
+    take?: number;
+  }): { items: DbVenueRequest[]; total: number } {
+    let list = Array.from(this.venueRequests.values());
+
+    if (filter?.venue_id) {
+      list = list.filter((r) => r.venue_id === filter.venue_id);
+    }
+    if (filter?.event_id) {
+      list = list.filter((r) => r.event_id === filter.event_id);
+    }
+    if (filter?.requesting_org_id) {
+      list = list.filter((r) => r.requesting_org_id === filter.requesting_org_id);
+    }
+    if (filter?.owner_org_id) {
+      list = list.filter((r) => {
+        const venue = this.venues.get(r.venue_id);
+        return venue?.owner_org_id === filter.owner_org_id;
+      });
+    }
+    if (filter?.status) {
+      list = list.filter((r) => r.status === filter.status);
+    }
+
+    list.sort((a, b) => b.created_at.getTime() - a.created_at.getTime());
+    const total = list.length;
+    const skip = filter?.skip || 0;
+    const take = filter?.take || 10;
+    return {
+      items: list.slice(skip, skip + take),
+      total,
+    };
+  }
+
+  public updateVenueRequest(
+    id: string,
+    updates: Partial<DbVenueRequest>
+  ): DbVenueRequest | null {
+    const req = this.venueRequests.get(id);
+    if (!req) return null;
+    const updated: DbVenueRequest = {
+      ...req,
+      ...updates,
+      updated_at: new Date(),
+    };
+    this.venueRequests.set(id, updated);
     return updated;
   }
 

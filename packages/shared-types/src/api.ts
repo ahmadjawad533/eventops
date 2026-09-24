@@ -8,6 +8,8 @@ import {
   RegistrationStatus,
   CollaborationType,
   CollaborationStatus,
+  SponsorshipStatus,
+  VenueRequestStatus,
 } from './enums';
 
 export interface ApiResponse<T = any> {
@@ -210,3 +212,41 @@ export interface SimulateActivityDto {
   clicks?: number;
   registrations?: number;
 }
+
+export interface CreateSponsorshipOpportunityDto {
+  event_id: string;
+  title: string;
+  needs: Record<string, any>;
+  budget_range?: string;
+}
+
+export interface ApplySponsorshipDto {
+  sponsor_org_id: string;
+  notes?: string;
+}
+
+export interface UpdateSponsorshipApplicationStatusDto {
+  status: SponsorshipStatus;
+  notes?: string;
+}
+
+export interface CreateVenueDto {
+  owner_org_id: string;
+  name: string;
+  capacity: number;
+  facilities: Record<string, any>;
+  city: string;
+}
+
+export interface CreateVenueRequestDto {
+  venue_id: string;
+  event_id: string;
+  requesting_org_id: string;
+  notes?: string;
+}
+
+export interface RespondVenueRequestDto {
+  action: 'accept' | 'reject' | 'counter';
+  notes?: string;
+}
+
