@@ -1,5 +1,5 @@
 import { UserProfile, UserRole } from './models';
-import { RoleType } from './enums';
+import { RoleType, OrganizationType } from './enums';
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -64,6 +64,27 @@ export interface UpdateProfileDto {
 export interface AssignRoleDto {
   role_type: RoleType;
   org_id?: string;
+}
+
+export interface CreateOrganizationDto {
+  name: string;
+  type: OrganizationType;
+  description?: string;
+  website?: string;
+}
+
+export interface UpdateOrganizationDto {
+  name?: string;
+  description?: string;
+  website?: string;
+}
+
+export interface VerifyOrganizationDto {
+  verified: boolean;
+}
+
+export interface AssignCommunityAdminDto {
+  user_id: string;
 }
 
 export interface TicketPayload {
