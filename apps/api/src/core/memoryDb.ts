@@ -1322,6 +1322,39 @@ class MemoryDatabase {
     this.auditLogs.unshift(entry);
     return entry;
   }
+
+  public findAuditLogsPaginated(filter?: {
+    actor_user_id?: string;
+    action?: string;
+    target_type?: string;
+    target_id?: string;
+    skip?: number;
+    take?: number;
+  }): { items: DbAuditLog[]; total: number } {
+    let list = this.auditLogs;
+
+    if (filter?.actor_user_id) {
+      list = list.filter((l) => l.actor_user_id === filter.actor_user_id);
+    }
+    if (filter?.action) {
+      list = list.filter((l) => l.action === filter.action);
+    }
+    if (filter?.target_type) {
+      list = list.filter((l) => l.target_type === filter.target_type);
+    }
+    if (filter?.target_id) {
+      list = list.filter((l) => l.target_id === filter.target_id);
+    }
+
+    const total = list.length;
+    const skip = filter?.skip || 0;
+    const take = filter?.take || 20;
+
+    return {
+      items: list.slice(skip, skip + take),
+      total,
+    };
+  }
 }
 
 export const memoryDb = new MemoryDatabase();

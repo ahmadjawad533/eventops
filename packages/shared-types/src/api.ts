@@ -250,3 +250,88 @@ export interface RespondVenueRequestDto {
   notes?: string;
 }
 
+export interface OrganizerDashboardMetrics {
+  summary: {
+    total_events: number;
+    published_events: number;
+    draft_events: number;
+    completed_events: number;
+    cancelled_events: number;
+    total_registrations: number;
+    total_attended: number;
+    average_attendance_rate: number;
+    total_collaborations: number;
+    total_sponsorships_confirmed: number;
+  };
+  events_breakdown: Array<{
+    id: string;
+    title: string;
+    status: EventStatus;
+    start_date: string;
+    capacity: number;
+    registered_count: number;
+    attended_count: number;
+    attendance_rate: number;
+    remaining_capacity: number;
+  }>;
+  recent_activity: Array<{
+    id: string;
+    action: string;
+    target_type: string;
+    target_id: string;
+    created_at: string;
+    metadata?: any;
+  }>;
+}
+
+export interface CommunityDashboardMetrics {
+  summary: {
+    member_count: number;
+    follower_count: number;
+    total_outreach_campaigns: number;
+    total_outreach_delivered: number;
+    total_outreach_opened: number;
+    total_outreach_clicked: number;
+    total_outreach_registrations: number;
+    average_open_rate: number;
+    average_click_rate: number;
+    conversion_rate: number;
+  };
+  campaigns_breakdown: Array<{
+    id: string;
+    outreach_request_id: string;
+    purpose: string;
+    target_audience: string;
+    requesting_org_name: string;
+    sent_count: number;
+    delivered_count: number;
+    opened_count: number;
+    clicked_count: number;
+    registrations_count: number;
+    open_rate: number;
+    click_rate: number;
+    created_at: string;
+  }>;
+  recent_activity: Array<{
+    id: string;
+    action: string;
+    target_type: string;
+    target_id: string;
+    created_at: string;
+    metadata?: any;
+  }>;
+}
+
+export interface AuditLogItem {
+  id: string;
+  actor_user_id?: string | null;
+  action: string;
+  target_type: string;
+  target_id: string;
+  metadata?: any;
+  created_at: string;
+  actor_name?: string;
+  actor_email?: string;
+}
+
+

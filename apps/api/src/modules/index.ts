@@ -10,6 +10,7 @@ import { outreachRoutes } from './outreach/outreach.routes';
 import { sponsorshipRoutes } from './sponsorship/sponsorship.routes';
 import { venuesRoutes } from './venues/venues.routes';
 import { notificationsRoutes } from './notifications/notifications.routes';
+import { dashboardsRoutes } from './dashboards/dashboards.routes';
 
 import { eventsController } from './events/events.controller';
 
@@ -27,5 +28,7 @@ apiRouter.use('/outreach', outreachRoutes);
 apiRouter.use('/sponsorship', sponsorshipRoutes);
 apiRouter.use('/venues', venuesRoutes);
 apiRouter.use('/notifications', notificationsRoutes);
+apiRouter.use('/dashboards', dashboardsRoutes);
+apiRouter.use('/audit-logs', dashboardsRoutes);
 
 export { apiRouter };

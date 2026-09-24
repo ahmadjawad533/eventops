@@ -16,6 +16,7 @@ import { CollaborationTab } from './components/CollaborationTab';
 import { OutreachTab } from './components/OutreachTab';
 import { SponsorshipTab } from './components/SponsorshipTab';
 import { VenuesTab } from './components/VenuesTab';
+import { DashboardsTab } from './components/DashboardsTab';
 
 interface HealthStatus {
   status: string;
@@ -60,7 +61,7 @@ export function App() {
   const [roles, setRoles] = useState<UserRole[]>([]);
 
   // Navigation tab
-  const [activeTab, setActiveTab] = useState<'events' | 'organizations' | 'certificates' | 'profile' | 'collaborations' | 'outreach' | 'sponsorships' | 'venues'>('events');
+  const [activeTab, setActiveTab] = useState<'events' | 'organizations' | 'certificates' | 'profile' | 'collaborations' | 'outreach' | 'sponsorships' | 'venues' | 'dashboards'>('events');
 
   // Auth Form state
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
@@ -832,6 +833,16 @@ export function App() {
                 🏛️ Venues &amp; Bookings
               </button>
               <button
+                onClick={() => setActiveTab('dashboards')}
+                className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${
+                  activeTab === 'dashboards'
+                    ? 'bg-violet-600/20 text-violet-400 border border-violet-500/30'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                📊 Dashboards &amp; Audit
+              </button>
+              <button
                 onClick={() => setActiveTab('certificates')}
                 className={`px-4 py-2 text-sm font-semibold rounded-lg transition ${
                   activeTab === 'certificates'
@@ -1331,6 +1342,16 @@ export function App() {
             {/* TAB: VENUES MARKETPLACE & BOOKING REQUESTS */}
             {activeTab === 'venues' && (
               <VenuesTab
+                token={token}
+                userOrgs={orgs}
+                userEvents={events}
+                roles={roles}
+              />
+            )}
+
+            {/* TAB: DASHBOARDS & AUDIT LOG */}
+            {activeTab === 'dashboards' && (
+              <DashboardsTab
                 token={token}
                 userOrgs={orgs}
                 userEvents={events}
