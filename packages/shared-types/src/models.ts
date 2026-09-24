@@ -103,6 +103,8 @@ export interface Collaboration {
   event?: Event;
   requesting_org?: Organization;
   target_org?: Organization;
+  messages?: CollaborationMessage[];
+  tasks?: CollaborationTask[];
 }
 
 export interface CollaborationMessage {
@@ -112,6 +114,19 @@ export interface CollaborationMessage {
   body: string;
   is_counterproposal: boolean;
   created_at: string;
+  sender_org?: Organization;
+}
+
+export interface CollaborationTask {
+  id: string;
+  collaboration_id: string;
+  title: string;
+  description?: string | null;
+  assigned_org_id?: string | null;
+  completed: boolean;
+  created_at: string;
+  updated_at: string;
+  assigned_org?: Organization;
 }
 
 export interface OutreachRequest {

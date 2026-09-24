@@ -7,6 +7,8 @@ import {
   EventFormat,
   EventStatus,
   RegistrationStatus,
+  CollaborationType,
+  CollaborationStatus,
 } from '@eventops/shared-types';
 
 export interface DbUser {
@@ -87,6 +89,37 @@ export interface DbCertificate {
   issued_at: Date;
 }
 
+export interface DbCollaboration {
+  id: string;
+  event_id: string;
+  requesting_org_id: string;
+  target_org_id: string;
+  collab_type: CollaborationType;
+  status: CollaborationStatus;
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface DbCollaborationMessage {
+  id: string;
+  collaboration_id: string;
+  sender_org_id: string;
+  body: string;
+  is_counterproposal: boolean;
+  created_at: Date;
+}
+
+export interface DbCollaborationTask {
+  id: string;
+  collaboration_id: string;
+  title: string;
+  description?: string | null;
+  assigned_org_id?: string | null;
+  completed: boolean;
+  created_at: Date;
+  updated_at: Date;
+}
+
 export interface DbAuditLog {
   id: string;
   actor_user_id?: string | null;
@@ -106,6 +139,9 @@ class MemoryDatabase {
   public events: Map<string, DbEvent> = new Map();
   public registrations: Map<string, DbEventRegistration> = new Map();
   public certificates: Map<string, DbCertificate> = new Map();
+  public collaborations: Map<string, DbCollaboration> = new Map();
+  public collaborationMessages: Map<string, DbCollaborationMessage> = new Map();
+  public collaborationTasks: Map<string, DbCollaborationTask> = new Map();
   public auditLogs: DbAuditLog[] = [];
 
   public clear() {
@@ -117,6 +153,9 @@ class MemoryDatabase {
     this.events.clear();
     this.registrations.clear();
     this.certificates.clear();
+    this.collaborations.clear();
+    this.collaborationMessages.clear();
+    this.collaborationTasks.clear();
     this.auditLogs = [];
   }
 
@@ -568,6 +607,167 @@ class MemoryDatabase {
       if (c.verification_id.toLowerCase() === verificationId.toLowerCase()) return c;
     }
     return null;
+  }
+
+  // --- Collaborations ---
+  public createCollaboration(data: {
+    event_id: string;
+    requesting_org_id: string;
+    target_org_id: string;
+    collab_type: CollaborationType;
+    status?: CollaborationStatus;
+  }): DbCollaboration {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const collab: DbCollaboration = {
+      id,
+      event_id: data.event_id,
+      requesting_org_id: data.requesting_org_id,
+      target_org_id: data.target_org_id,
+      collab_type: data.collab_type,
+      status: data.status || CollaborationStatus.PROPOSED,
+      created_at: now,
+      updated_at: now,
+    };
+    this.collaborations.set(id, collab);
+    return collab;
+  }
+
+  public findCollaborationById(id: string): DbCollaboration | null {
+    return this.collaborations.get(id) || null;
+  }
+
+  public updateCollaboration(id: string, updates: Partial<DbCollaboration>): DbCollaboration | null {
+    const collab = this.collaborations.get(id);
+    if (!collab) return null;
+    const updated: DbCollaboration = {
+      ...collab,
+      ...updates,
+      updated_at: new Date(),
+    };
+    this.collaborations.set(id, updated);
+    return updated;
+  }
+
+  public findCollaborations(filter?: {
+    org_id?: string;
+    event_id?: string;
+    status?: CollaborationStatus;
+    collab_type?: CollaborationType;
+    skip?: number;
+    take?: number;
+  }) {
+    let list = Array.from(this.collaborations.values());
+
+    if (filter?.org_id) {
+      list = list.filter(
+        (c) => c.requesting_org_id === filter.org_id || c.target_org_id === filter.org_id
+      );
+    }
+    if (filter?.event_id) {
+      list = list.filter((c) => c.event_id === filter.event_id);
+    }
+    if (filter?.status) {
+      list = list.filter((c) => c.status === filter.status);
+    }
+    if (filter?.collab_type) {
+      list = list.filter((c) => c.collab_type === filter.collab_type);
+    }
+
+    list.sort((a, b) => b.updated_at.getTime() - a.updated_at.getTime());
+    const total = list.length;
+    const skip = filter?.skip || 0;
+    const take = filter?.take || 10;
+    return {
+      items: list.slice(skip, skip + take),
+      total,
+    };
+  }
+
+  // --- Collaboration Messages ---
+  public createCollaborationMessage(data: {
+    collaboration_id: string;
+    sender_org_id: string;
+    body: string;
+    is_counterproposal?: boolean;
+  }): DbCollaborationMessage {
+    const id = crypto.randomUUID();
+    const msg: DbCollaborationMessage = {
+      id,
+      collaboration_id: data.collaboration_id,
+      sender_org_id: data.sender_org_id,
+      body: data.body,
+      is_counterproposal: data.is_counterproposal || false,
+      created_at: new Date(),
+    };
+    this.collaborationMessages.set(id, msg);
+    return msg;
+  }
+
+  public getCollaborationMessages(collaboration_id: string): DbCollaborationMessage[] {
+    const list: DbCollaborationMessage[] = [];
+    for (const msg of this.collaborationMessages.values()) {
+      if (msg.collaboration_id === collaboration_id) {
+        list.push(msg);
+      }
+    }
+    list.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
+    return list;
+  }
+
+  // --- Collaboration Tasks ---
+  public createCollaborationTask(data: {
+    collaboration_id: string;
+    title: string;
+    description?: string | null;
+    assigned_org_id?: string | null;
+    completed?: boolean;
+  }): DbCollaborationTask {
+    const id = crypto.randomUUID();
+    const now = new Date();
+    const task: DbCollaborationTask = {
+      id,
+      collaboration_id: data.collaboration_id,
+      title: data.title,
+      description: data.description || null,
+      assigned_org_id: data.assigned_org_id || null,
+      completed: data.completed || false,
+      created_at: now,
+      updated_at: now,
+    };
+    this.collaborationTasks.set(id, task);
+    return task;
+  }
+
+  public findCollaborationTaskById(id: string): DbCollaborationTask | null {
+    return this.collaborationTasks.get(id) || null;
+  }
+
+  public updateCollaborationTask(id: string, updates: Partial<DbCollaborationTask>): DbCollaborationTask | null {
+    const task = this.collaborationTasks.get(id);
+    if (!task) return null;
+    const updated: DbCollaborationTask = {
+      ...task,
+      ...updates,
+      updated_at: new Date(),
+    };
+    this.collaborationTasks.set(id, updated);
+    return updated;
+  }
+
+  public deleteCollaborationTask(id: string): boolean {
+    return this.collaborationTasks.delete(id);
+  }
+
+  public getCollaborationTasks(collaboration_id: string): DbCollaborationTask[] {
+    const list: DbCollaborationTask[] = [];
+    for (const task of this.collaborationTasks.values()) {
+      if (task.collaboration_id === collaboration_id) {
+        list.push(task);
+      }
+    }
+    list.sort((a, b) => a.created_at.getTime() - b.created_at.getTime());
+    return list;
   }
 
   // --- Audit Logs ---

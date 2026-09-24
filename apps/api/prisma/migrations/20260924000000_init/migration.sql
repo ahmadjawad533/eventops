@@ -391,3 +391,26 @@ ALTER TABLE "venue_requests" ADD CONSTRAINT "venue_requests_requesting_org_id_fk
 
 -- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_actor_user_id_fkey" FOREIGN KEY ("actor_user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- CreateTable
+CREATE TABLE "collaboration_tasks" (
+    "id" UUID NOT NULL DEFAULT gen_random_uuid(),
+    "collaboration_id" UUID NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT,
+    "assigned_org_id" UUID,
+    "completed" BOOLEAN NOT NULL DEFAULT false,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "collaboration_tasks_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "collaboration_tasks_collaboration_id_idx" ON "collaboration_tasks"("collaboration_id");
+CREATE INDEX "collaboration_tasks_assigned_org_id_idx" ON "collaboration_tasks"("assigned_org_id");
+
+-- AddForeignKey
+ALTER TABLE "collaboration_tasks" ADD CONSTRAINT "collaboration_tasks_collaboration_id_fkey" FOREIGN KEY ("collaboration_id") REFERENCES "collaborations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "collaboration_tasks" ADD CONSTRAINT "collaboration_tasks_assigned_org_id_fkey" FOREIGN KEY ("assigned_org_id") REFERENCES "organizations"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+

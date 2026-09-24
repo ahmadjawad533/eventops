@@ -35,6 +35,7 @@ erDiagram
     EventRegistration ||--o| Certificate : "earns upon attended"
 
     Collaboration ||--o{ CollaborationMessage : "contains thread"
+    Collaboration ||--o{ CollaborationTask : "shared workspace tasks"
 
     OutreachRequest ||--o| OutreachCampaign : "tracks aggregated metrics"
 
@@ -138,6 +139,17 @@ erDiagram
         text body
         boolean is_counterproposal
         datetime created_at
+    }
+
+    CollaborationTask {
+        uuid id PK
+        uuid collaboration_id FK
+        string title
+        string description "nullable"
+        uuid assigned_org_id FK "nullable"
+        boolean completed
+        datetime created_at
+        datetime updated_at
     }
 
     OutreachRequest {

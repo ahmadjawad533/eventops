@@ -1,4 +1,4 @@
-import { UserProfile, UserRole } from './models';
+import { UserProfile, UserRole, Collaboration, CollaborationMessage, CollaborationTask } from './models';
 import {
   RoleType,
   OrganizationType,
@@ -6,6 +6,8 @@ import {
   EventFormat,
   EventStatus,
   RegistrationStatus,
+  CollaborationType,
+  CollaborationStatus,
 } from './enums';
 
 export interface ApiResponse<T = any> {
@@ -145,4 +147,42 @@ export interface CertificateVerification {
     event_location?: string | null;
     organizer_name: string;
   };
+}
+
+export interface ProposeCollaborationDto {
+  event_id: string;
+  requesting_org_id: string;
+  target_org_id: string;
+  collab_type: CollaborationType;
+  initial_message: string;
+}
+
+export interface RespondCollaborationDto {
+  action: 'accept' | 'reject' | 'counter';
+  message?: string;
+}
+
+export interface SendCollaborationMessageDto {
+  sender_org_id: string;
+  body: string;
+  is_counterproposal?: boolean;
+}
+
+export interface CreateCollaborationTaskDto {
+  title: string;
+  description?: string;
+  assigned_org_id?: string;
+}
+
+export interface UpdateCollaborationTaskDto {
+  title?: string;
+  description?: string;
+  assigned_org_id?: string;
+  completed?: boolean;
+}
+
+export interface CollaborationWorkspaceResponse {
+  collaboration: Collaboration;
+  tasks: CollaborationTask[];
+  messages: CollaborationMessage[];
 }

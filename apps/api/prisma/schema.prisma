@@ -149,6 +149,7 @@ model Organization {
   collaborations_out      Collaboration[]        @relation("CollabRequestingOrg")
   collaborations_in       Collaboration[]        @relation("CollabTargetOrg")
   collaboration_messages  CollaborationMessage[]
+  collaboration_tasks     CollaborationTask[]
   outreach_requests_out   OutreachRequest[]      @relation("OutreachRequestingOrg")
   outreach_requests_in    OutreachRequest[]      @relation("OutreachTargetCommunity")
   sponsorship_applications SponsorshipApplication[]
@@ -263,6 +264,7 @@ model Collaboration {
   requesting_org Organization           @relation("CollabRequestingOrg", fields: [requesting_org_id], references: [id], onDelete: Cascade)
   target_org     Organization           @relation("CollabTargetOrg", fields: [target_org_id], references: [id], onDelete: Cascade)
   messages       CollaborationMessage[]
+  tasks          CollaborationTask[]
 
   @@index([event_id])
   @@index([requesting_org_id])
@@ -283,6 +285,24 @@ model CollaborationMessage {
 
   @@index([collaboration_id])
   @@map("collaboration_messages")
+}
+
+model CollaborationTask {
+  id               String        @id @default(uuid()) @db.Uuid
+  collaboration_id String        @db.Uuid
+  title            String
+  description      String?
+  assigned_org_id  String?       @db.Uuid
+  completed        Boolean       @default(false)
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+
+  collaboration    Collaboration @relation(fields: [collaboration_id], references: [id], onDelete: Cascade)
+  assigned_org     Organization? @relation(fields: [assigned_org_id], references: [id], onDelete: SetNull)
+
+  @@index([collaboration_id])
+  @@index([assigned_org_id])
+  @@map("collaboration_tasks")
 }
 
 model OutreachRequest {
