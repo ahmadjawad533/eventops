@@ -1,0 +1,84 @@
+# ==========================================
+# EventOps API — Production Multi-Stage Build
+# ==========================================
+
+# ------------------------------------------
+# Stage 1: Builder
+# ------------------------------------------
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+RUN apk add --no-cache libc6-compat openssl
+
+# Copy root workspace manifests
+COPY package.json package-lock.json* ./
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+
+# Clean install all dependencies (including devDependencies needed for build)
+RUN npm ci
+
+# Copy TypeScript configuration and sources
+COPY tsconfig.base.json* ./
+COPY packages/shared-types ./packages/shared-types
+COPY apps/api ./apps/api
+
+# Build shared-types
+RUN npm run build --workspace=@eventops/shared-types
+
+# Generate Prisma Client
+WORKDIR /app/apps/api
+RUN npx prisma generate
+
+# Compile TypeScript backend
+WORKDIR /app
+RUN npm run build --workspace=@eventops/api
+
+# Prune development dependencies to keep final bundle lean
+RUN npm prune --production
+
+# ------------------------------------------
+# Stage 2: Production Runner
+# ------------------------------------------
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Install runtime utilities & dumb-init for proper PID 1 signal handling
+RUN apk add --no-cache openssl dumb-init wget
+
+ENV NODE_ENV=production
+ENV PORT=4000
+
+# Create dedicated non-root user and group
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 eventops
+
+# Copy workspace package manifests
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/packages/shared-types/package.json ./packages/shared-types/
+COPY --from=builder /app/apps/api/package.json ./apps/api/
+
+# Copy production node_modules (including generated Prisma client)
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy compiled artifacts
+COPY --from=builder /app/packages/shared-types/dist ./packages/shared-types/dist
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
+
+# Enforce secure file ownership
+RUN chown -R eventops:nodejs /app
+
+USER eventops
+
+EXPOSE 4000
+
+# Built-in health check for container orchestrators (Docker / ECS)
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:4000/api/health || exit 1
+
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD ["node", "apps/api/dist/server.js"]

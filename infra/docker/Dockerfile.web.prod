@@ -1,0 +1,59 @@
+# ==========================================
+# EventOps Web — Production Multi-Stage Build
+# ==========================================
+
+# ------------------------------------------
+# Stage 1: Builder
+# ------------------------------------------
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy root workspace manifests
+COPY package.json package-lock.json* ./
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+
+# Clean install all dependencies
+RUN npm ci
+
+# Copy TypeScript configuration and sources
+COPY tsconfig.base.json* ./
+COPY packages/shared-types ./packages/shared-types
+COPY apps/web ./apps/web
+
+# Build shared-types
+RUN npm run build --workspace=@eventops/shared-types
+
+# Build production Vite bundle
+ARG VITE_API_URL=/api
+ENV VITE_API_URL=$VITE_API_URL
+
+RUN npm run build --workspace=@eventops/web
+
+# ------------------------------------------
+# Stage 2: Production Nginx Server
+# ------------------------------------------
+FROM nginx:1.27-alpine AS runner
+
+# Install wget for healthcheck
+RUN apk add --no-cache wget
+
+# Copy custom Nginx configuration
+COPY infra/docker/nginx.conf /etc/nginx/nginx.conf
+
+# Copy compiled static assets from builder
+COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+
+# Set appropriate permissions
+RUN chown -R nginx:nginx /usr/share/nginx/html && \
+    chmod -R 755 /usr/share/nginx/html
+
+EXPOSE 80
+
+# Built-in health check using /healthz endpoint
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:80/healthz || exit 1
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,0 +1,72 @@
+name: EventOps CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Code Quality, Typecheck & Automated Test Suite
+  # ---------------------------------------------------------------------------
+  test-and-build:
+    name: Test & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build monorepo packages and apps
+        run: npm run build
+
+      - name: Run linting checks
+        run: npm run lint
+
+      - name: Run API test suites (Unit & Integration)
+        run: npm test --prefix apps/api -- --runInBand
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Container Image Build Validation
+  # ---------------------------------------------------------------------------
+  docker-validation:
+    name: Docker Build Validation
+    needs: test-and-build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Validate API Production Dockerfile
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/Dockerfile.api.prod
+          push: false
+          tags: eventops-api:ci-test
+
+      - name: Validate Web Production Dockerfile
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: infra/docker/Dockerfile.web.prod
+          push: false
+          tags: eventops-web:ci-test
