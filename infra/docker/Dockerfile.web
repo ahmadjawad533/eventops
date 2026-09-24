@@ -1,0 +1,22 @@
+FROM node:20-alpine AS dev
+
+WORKDIR /app
+
+COPY package.json ./
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+
+RUN npm install
+
+COPY packages/shared-types ./packages/shared-types
+COPY apps/web ./apps/web
+
+RUN npm run build --workspace=@eventops/shared-types
+
+WORKDIR /app/apps/web
+
+EXPOSE 3000
+
+ENV NODE_ENV=development
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]

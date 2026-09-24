@@ -1,0 +1,417 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum RoleType {
+  attendee
+  organizer
+  community_admin
+  sponsor
+  venue_owner
+  platform_admin
+}
+
+enum OrganizationType {
+  community
+  company
+  university
+  ngo
+}
+
+enum OrgMemberRole {
+  member
+  moderator
+  admin
+  owner
+}
+
+enum EventFormat {
+  online
+  offline
+}
+
+enum EventStatus {
+  draft
+  published
+  completed
+  cancelled
+}
+
+enum EventCategory {
+  tech
+  design
+  business
+  science
+  social
+  other
+}
+
+enum RegistrationStatus {
+  registered
+  checked_in
+  attended
+}
+
+enum CollaborationType {
+  outreach
+  sponsorship
+  venue
+  speaker
+  media
+  technical
+  general
+}
+
+enum CollaborationStatus {
+  proposed
+  countered
+  accepted
+  rejected
+}
+
+enum OutreachStatus {
+  pending
+  approved
+  rejected
+  needs_info
+}
+
+enum SponsorshipStatus {
+  potential
+  contacted
+  interested
+  negotiation
+  confirmed
+  completed
+}
+
+enum VenueRequestStatus {
+  requested
+  accepted
+  rejected
+  countered
+}
+
+model User {
+  id            String    @id @default(uuid()) @db.Uuid
+  email         String    @unique
+  password_hash String
+  name          String
+  interests     String[]  @default([])
+  avatar_url    String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+
+  roles               Role[]
+  memberships         OrganizationMember[]
+  followed_communities CommunityFollower[]
+  registrations       EventRegistration[]
+  audit_logs          AuditLog[]
+  outreach_reviews    OutreachRequest[]
+
+  @@map("users")
+}
+
+model Role {
+  id         String    @id @default(uuid()) @db.Uuid
+  user_id    String    @db.Uuid
+  org_id     String?   @db.Uuid
+  role_type  RoleType
+  created_at DateTime  @default(now())
+
+  user         User          @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  organization Organization? @relation(fields: [org_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@index([org_id])
+  @@map("roles")
+}
+
+model Organization {
+  id          String           @id @default(uuid()) @db.Uuid
+  name        String
+  type        OrganizationType
+  verified    Boolean          @default(false)
+  description String?
+  website     String?
+  created_at  DateTime         @default(now())
+  updated_at  DateTime         @updatedAt
+
+  roles                   Role[]
+  members                 OrganizationMember[]
+  followers               CommunityFollower[]
+  events                  Event[]
+  collaborations_out      Collaboration[]        @relation("CollabRequestingOrg")
+  collaborations_in       Collaboration[]        @relation("CollabTargetOrg")
+  collaboration_messages  CollaborationMessage[]
+  outreach_requests_out   OutreachRequest[]      @relation("OutreachRequestingOrg")
+  outreach_requests_in    OutreachRequest[]      @relation("OutreachTargetCommunity")
+  sponsorship_applications SponsorshipApplication[]
+  venues                  Venue[]
+  venue_requests_out      VenueRequest[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id          String        @id @default(uuid()) @db.Uuid
+  org_id      String        @db.Uuid
+  user_id     String        @db.Uuid
+  role_in_org OrgMemberRole @default(member)
+  joined_at   DateTime      @default(now())
+
+  organization Organization @relation(fields: [org_id], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([org_id, user_id])
+  @@index([user_id])
+  @@index([org_id])
+  @@map("organization_members")
+}
+
+model CommunityFollower {
+  id               String   @id @default(uuid()) @db.Uuid
+  community_org_id String   @db.Uuid
+  user_id          String   @db.Uuid
+  followed_at      DateTime @default(now())
+
+  community Organization @relation(fields: [community_org_id], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([community_org_id, user_id])
+  @@index([user_id])
+  @@index([community_org_id])
+  @@map("community_followers")
+}
+
+model Event {
+  id               String        @id @default(uuid()) @db.Uuid
+  organizer_org_id String        @db.Uuid
+  title            String
+  description      String
+  category         EventCategory
+  format           EventFormat
+  start_date       DateTime
+  end_date         DateTime
+  location         String?
+  capacity         Int
+  status           EventStatus   @default(draft)
+  created_at       DateTime      @default(now())
+  updated_at       DateTime      @updatedAt
+
+  organizer                Organization             @relation(fields: [organizer_org_id], references: [id], onDelete: Cascade)
+  registrations            EventRegistration[]
+  collaborations           Collaboration[]
+  outreach_requests        OutreachRequest[]
+  sponsorship_opportunities SponsorshipOpportunity[]
+  venue_requests           VenueRequest[]
+
+  @@index([organizer_org_id])
+  @@index([category])
+  @@index([status])
+  @@index([start_date])
+  @@map("events")
+}
+
+model EventRegistration {
+  id            String             @id @default(uuid()) @db.Uuid
+  event_id      String             @db.Uuid
+  user_id       String             @db.Uuid
+  ticket_code   String             @unique
+  status        RegistrationStatus @default(registered)
+  registered_at DateTime           @default(now())
+  checked_in_at DateTime?
+
+  event       Event        @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  certificate Certificate?
+
+  @@unique([event_id, user_id])
+  @@index([user_id])
+  @@index([event_id])
+  @@map("event_registrations")
+}
+
+model Certificate {
+  id              String   @id @default(uuid()) @db.Uuid
+  registration_id String   @unique @db.Uuid
+  verification_id String   @unique
+  issued_at       DateTime @default(now())
+
+  registration EventRegistration @relation(fields: [registration_id], references: [id], onDelete: Cascade)
+
+  @@index([verification_id])
+  @@map("certificates")
+}
+
+model Collaboration {
+  id                String              @id @default(uuid()) @db.Uuid
+  event_id          String              @db.Uuid
+  requesting_org_id String              @db.Uuid
+  target_org_id     String              @db.Uuid
+  collab_type       CollaborationType
+  status            CollaborationStatus @default(proposed)
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+
+  event          Event                  @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  requesting_org Organization           @relation("CollabRequestingOrg", fields: [requesting_org_id], references: [id], onDelete: Cascade)
+  target_org     Organization           @relation("CollabTargetOrg", fields: [target_org_id], references: [id], onDelete: Cascade)
+  messages       CollaborationMessage[]
+
+  @@index([event_id])
+  @@index([requesting_org_id])
+  @@index([target_org_id])
+  @@map("collaborations")
+}
+
+model CollaborationMessage {
+  id                  String   @id @default(uuid()) @db.Uuid
+  collaboration_id    String   @db.Uuid
+  sender_org_id       String   @db.Uuid
+  body                String
+  is_counterproposal  Boolean  @default(false)
+  created_at          DateTime @default(now())
+
+  collaboration Collaboration @relation(fields: [collaboration_id], references: [id], onDelete: Cascade)
+  sender_org    Organization  @relation(fields: [sender_org_id], references: [id], onDelete: Cascade)
+
+  @@index([collaboration_id])
+  @@map("collaboration_messages")
+}
+
+model OutreachRequest {
+  id                        String         @id @default(uuid()) @db.Uuid
+  requesting_org_id         String         @db.Uuid
+  target_community_org_id   String         @db.Uuid
+  event_id                  String         @db.Uuid
+  purpose                   String
+  target_audience           String
+  requested_recipient_count Int
+  message_subject           String
+  message_body              String
+  status                    OutreachStatus @default(pending)
+  reviewed_by_user_id       String?        @db.Uuid
+  reviewed_at               DateTime?
+  created_at                DateTime       @default(now())
+  updated_at                DateTime       @updatedAt
+
+  requesting_org   Organization      @relation("OutreachRequestingOrg", fields: [requesting_org_id], references: [id], onDelete: Cascade)
+  target_community Organization      @relation("OutreachTargetCommunity", fields: [target_community_org_id], references: [id], onDelete: Cascade)
+  event            Event             @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  reviewed_by      User?             @relation(fields: [reviewed_by_user_id], references: [id], onDelete: SetNull)
+  campaign         OutreachCampaign?
+
+  @@index([requesting_org_id])
+  @@index([target_community_org_id])
+  @@index([event_id])
+  @@map("outreach_requests")
+}
+
+model OutreachCampaign {
+  id                   String   @id @default(uuid()) @db.Uuid
+  outreach_request_id  String   @unique @db.Uuid
+  sent_count           Int      @default(0)
+  delivered_count      Int      @default(0)
+  opened_count         Int      @default(0)
+  clicked_count        Int      @default(0)
+  registrations_count  Int      @default(0)
+  created_at           DateTime @default(now())
+  updated_at           DateTime @updatedAt
+
+  outreach_request OutreachRequest @relation(fields: [outreach_request_id], references: [id], onDelete: Cascade)
+
+  @@map("outreach_campaigns")
+}
+
+model SponsorshipOpportunity {
+  id           String   @id @default(uuid()) @db.Uuid
+  event_id     String   @db.Uuid
+  title        String
+  needs        Json
+  budget_range String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  event        Event                    @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  applications SponsorshipApplication[]
+
+  @@index([event_id])
+  @@map("sponsorship_opportunities")
+}
+
+model SponsorshipApplication {
+  id             String            @id @default(uuid()) @db.Uuid
+  opportunity_id String            @db.Uuid
+  sponsor_org_id String            @db.Uuid
+  status         SponsorshipStatus @default(potential)
+  notes          String?
+  created_at     DateTime          @default(now())
+  updated_at     DateTime          @updatedAt
+
+  opportunity SponsorshipOpportunity @relation(fields: [opportunity_id], references: [id], onDelete: Cascade)
+  sponsor_org Organization           @relation(fields: [sponsor_org_id], references: [id], onDelete: Cascade)
+
+  @@index([opportunity_id])
+  @@index([sponsor_org_id])
+  @@map("sponsorship_applications")
+}
+
+model Venue {
+  id           String   @id @default(uuid()) @db.Uuid
+  owner_org_id String   @db.Uuid
+  name         String
+  capacity     Int
+  facilities   Json
+  city         String
+  created_at   DateTime @default(now())
+  updated_at   DateTime @updatedAt
+
+  owner_org Organization   @relation(fields: [owner_org_id], references: [id], onDelete: Cascade)
+  requests  VenueRequest[]
+
+  @@index([owner_org_id])
+  @@index([city])
+  @@map("venues")
+}
+
+model VenueRequest {
+  id                String             @id @default(uuid()) @db.Uuid
+  venue_id          String             @db.Uuid
+  event_id          String             @db.Uuid
+  requesting_org_id String             @db.Uuid
+  status            VenueRequestStatus @default(requested)
+  created_at        DateTime           @default(now())
+  updated_at        DateTime           @updatedAt
+
+  venue          Venue        @relation(fields: [venue_id], references: [id], onDelete: Cascade)
+  event          Event        @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  requesting_org Organization @relation(fields: [requesting_org_id], references: [id], onDelete: Cascade)
+
+  @@index([venue_id])
+  @@index([event_id])
+  @@index([requesting_org_id])
+  @@map("venue_requests")
+}
+
+model AuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  actor_user_id String?  @db.Uuid
+  action        String
+  target_type   String
+  target_id     String
+  metadata      Json?
+  created_at    DateTime @default(now())
+
+  actor User? @relation(fields: [actor_user_id], references: [id], onDelete: SetNull)
+
+  @@index([actor_user_id])
+  @@index([action])
+  @@index([target_type, target_id])
+  @@map("audit_logs")
+}

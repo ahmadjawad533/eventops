@@ -1,0 +1,33 @@
+FROM node:20-alpine AS base
+
+WORKDIR /app
+
+# Install dependencies needed for native modules if any
+RUN apk add --no-cache libc6-compat openssl
+
+# Copy root workspace manifests
+COPY package.json ./
+COPY packages/shared-types/package.json ./packages/shared-types/
+COPY apps/api/package.json ./apps/api/
+COPY apps/web/package.json ./apps/web/
+
+RUN npm install
+
+# Copy source code
+COPY tsconfig.base.json* ./
+COPY packages/shared-types ./packages/shared-types
+COPY apps/api ./apps/api
+
+# Build shared types
+RUN npm run build --workspace=@eventops/shared-types
+
+# Generate Prisma client
+WORKDIR /app/apps/api
+RUN npx prisma generate
+
+WORKDIR /app
+
+EXPOSE 4000
+
+ENV NODE_ENV=development
+CMD ["npm", "run", "dev", "--workspace=@eventops/api"]
