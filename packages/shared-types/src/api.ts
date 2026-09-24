@@ -1,4 +1,5 @@
 import { UserProfile, UserRole } from './models';
+import { RoleType } from './enums';
 
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -35,6 +36,34 @@ export interface AuthResponse {
   user: UserProfile;
   roles: UserRole[];
   tokens: AuthTokens;
+}
+
+export interface RegisterDto {
+  email: string;
+  password: string;
+  name: string;
+  roles?: RoleType[];
+  interests?: string[];
+}
+
+export interface LoginDto {
+  email: string;
+  password: string;
+}
+
+export interface RefreshTokenDto {
+  refreshToken: string;
+}
+
+export interface UpdateProfileDto {
+  name?: string;
+  interests?: string[];
+  avatar_url?: string;
+}
+
+export interface AssignRoleDto {
+  role_type: RoleType;
+  org_id?: string;
 }
 
 export interface TicketPayload {
