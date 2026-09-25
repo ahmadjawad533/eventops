@@ -8,7 +8,12 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces --if-present",
+    "postinstall": "npm run prisma:generate --workspace=@eventops/api",
+    "prisma:generate": "npm run prisma:generate --workspace=@eventops/api",
+    "build:types": "npm run build --workspace=@eventops/shared-types",
+    "build:api": "npm run build --workspace=@eventops/api",
+    "build:web": "npm run build --workspace=@eventops/web",
+    "build": "npm run build:types && npm run build:api && npm run build:web",
     "dev:api": "npm run dev --workspace=@eventops/api",
     "dev:web": "npm run dev --workspace=@eventops/web",
     "lint": "npm run lint --workspaces --if-present",

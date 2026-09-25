@@ -17,6 +17,13 @@ jobs:
   test-and-build:
     name: Test & Build
     runs-on: ubuntu-latest
+    env:
+      CI: true
+      NODE_ENV: test
+      PORT: 4000
+      JWT_ACCESS_SECRET: ci_test_jwt_access_secret_key_2026
+      JWT_REFRESH_SECRET: ci_test_jwt_refresh_secret_key_2026
+      TICKET_SIGNING_SECRET: ci_test_ticket_signing_secret_key_2026
 
     steps:
       - name: Checkout repository
@@ -31,6 +38,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Generate Prisma Client
+        run: npx prisma generate --schema=apps/api/prisma/schema.prisma
+
       - name: Build monorepo packages and apps
         run: npm run build
 
@@ -38,7 +48,7 @@ jobs:
         run: npm run lint
 
       - name: Run API test suites (Unit & Integration)
-        run: npm test --prefix apps/api -- --runInBand
+        run: npm test --workspace=@eventops/api -- --runInBand --forceExit
 
   # ---------------------------------------------------------------------------
   # Job 2: Container Image Build Validation
