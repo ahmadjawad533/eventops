@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "npm run build --workspace=@eventops/shared-types",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "echo \"Linting @eventops/web...\""

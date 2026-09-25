@@ -5,6 +5,7 @@
   "description": "EventOps Express Backend - Modular Monolith",
   "main": "dist/server.js",
   "scripts": {
+    "prebuild": "npm run build --workspace=@eventops/shared-types",
     "build": "prisma generate && tsc",
     "start": "node dist/server.js",
     "dev": "tsx watch src/server.ts",
