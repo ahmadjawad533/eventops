@@ -41,6 +41,12 @@ import {
   Menu,
   X,
   Layers,
+  Zap,
+  Star,
+  Check,
+  Crown,
+  ShieldAlert,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { CollaborationTab } from './components/CollaborationTab';
 import { OutreachTab } from './components/OutreachTab';
@@ -82,6 +88,50 @@ interface RegisteredTicket {
   };
 }
 
+// Pre-seeded Demo Accounts for 1-Click Instant Sign In
+const DEMO_ACCOUNTS = [
+  {
+    name: 'Olivia Organizer',
+    email: 'organizer@summit.org',
+    password: 'Password123!',
+    role: RoleType.ORGANIZER,
+    label: '👑 Organizer',
+    desc: 'Event Host & Producer',
+  },
+  {
+    name: 'Chloe Community',
+    email: 'admin@reactcommunity.org',
+    password: 'Password123!',
+    role: RoleType.COMMUNITY_ADMIN,
+    label: '👥 Community Admin',
+    desc: 'Community & Audience Manager',
+  },
+  {
+    name: 'Sam Sponsor',
+    email: 'sponsor@cloudcorp.io',
+    password: 'Password123!',
+    role: RoleType.SPONSOR,
+    label: '💼 Corporate Sponsor',
+    desc: 'Brand Partnerships & CRM',
+  },
+  {
+    name: 'Aaron Attendee',
+    email: 'attendee@coders.net',
+    password: 'Password123!',
+    role: RoleType.ATTENDEE,
+    label: '🎟️ Attendee',
+    desc: 'RSVP & Ticket Collector',
+  },
+  {
+    name: 'Platform SuperAdmin',
+    email: 'admin@eventops.io',
+    password: 'Password123!',
+    role: RoleType.PLATFORM_ADMIN,
+    label: '⚡ Super Admin',
+    desc: 'Platform-wide Governance',
+  },
+];
+
 export function App() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
 
@@ -108,10 +158,10 @@ export function App() {
 
   // Auth Form state
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [selectedRoles, setSelectedRoles] = useState<RoleType[]>([RoleType.ATTENDEE]);
+  const [email, setEmail] = useState('organizer@summit.org');
+  const [password, setPassword] = useState('Password123!');
+  const [name, setName] = useState('Olivia Organizer');
+  const [selectedRoles, setSelectedRoles] = useState<RoleType[]>([RoleType.ORGANIZER]);
   const [interestsInput, setInterestsInput] = useState('react, typescript, open-source');
   const [authError, setAuthError] = useState<string | null>(null);
   const [authSuccess, setAuthSuccess] = useState<string | null>(null);
@@ -148,7 +198,7 @@ export function App() {
   const [newEventCategory, setNewEventCategory] = useState<EventCategory>(EventCategory.TECH);
   const [newEventFormat, setNewEventFormat] = useState<EventFormat>(EventFormat.OFFLINE);
   const [newEventLocation, setNewEventLocation] = useState('Berlin Tech Hub');
-  const [newEventCapacity, setNewEventCapacity] = useState(50);
+  const [newEventCapacity, setNewEventCapacity] = useState(100);
   const [newEventStartDate, setNewEventStartDate] = useState(
     new Date(Date.now() + 86400000).toISOString().slice(0, 16)
   );
@@ -241,6 +291,55 @@ export function App() {
     }
   };
 
+  // Robust Quick Demo Sign In with Auto-Register Fallback
+  const handleQuickDemoSignIn = async (demo: typeof DEMO_ACCOUNTS[0]) => {
+    setAuthError(null);
+    setAuthSuccess(null);
+    setIsSubmitting(true);
+    setEmail(demo.email);
+    setPassword(demo.password);
+
+    try {
+      // 1. Try login first
+      let res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: demo.email, password: demo.password }),
+      });
+
+      let data = await res.json();
+
+      // 2. If login fails because user doesn't exist, auto-register!
+      if (!res.ok) {
+        res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: demo.email,
+            password: demo.password,
+            name: demo.name,
+            roles: [demo.role],
+            interests: ['tech', 'networking', 'open-source'],
+          }),
+        });
+
+        data = await res.json();
+        if (!res.ok) throw new Error(data.error?.message || 'Quick sign-in failed');
+      }
+
+      const accessToken = data.data.tokens.accessToken;
+      localStorage.setItem('eventops_token', accessToken);
+      setToken(accessToken);
+      setUser(data.data.user);
+      setRoles(data.data.roles);
+      setAuthSuccess(`Signed in as ${demo.name} (${demo.label})!`);
+    } catch (err: any) {
+      setAuthError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
@@ -248,13 +347,30 @@ export function App() {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch('/api/auth/login', {
+      let res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
-      const data = await res.json();
+      let data = await res.json();
+
+      // Auto-fallback to register if user doesn't exist yet
+      if (!res.ok && (data.error?.code === 'INVALID_CREDENTIALS' || res.status === 401)) {
+        res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            password,
+            name: name || email.split('@')[0],
+            roles: selectedRoles,
+            interests: ['tech', 'events'],
+          }),
+        });
+        data = await res.json();
+      }
+
       if (!res.ok) throw new Error(data.error?.message || 'Authentication failed');
 
       const accessToken = data.data.tokens.accessToken;
@@ -262,7 +378,7 @@ export function App() {
       setToken(accessToken);
       setUser(data.data.user);
       setRoles(data.data.roles);
-      setAuthSuccess('Welcome back to EventOps!');
+      setAuthSuccess('Authenticated successfully!');
     } catch (err: any) {
       setAuthError(err.message);
     } finally {
@@ -412,7 +528,7 @@ export function App() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || 'Failed to join community');
-      setOrgActionMsg('Successfully joined community!');
+      setOrgActionMsg('Successfully joined community as verified member!');
       loadOrganizations();
     } catch (err: any) {
       setOrgActionMsg(`Error: ${err.message}`);
@@ -482,7 +598,7 @@ export function App() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || 'Failed to publish event');
-      setEventActionMsg('Event published live!');
+      setEventActionMsg('Event published live to discovery network!');
       loadEvents();
     } catch (err: any) {
       setEventActionMsg(`Error: ${err.message}`);
@@ -500,7 +616,7 @@ export function App() {
       if (!res.ok) throw new Error(data.error?.message || 'Registration failed');
 
       setActiveTicket(data.data);
-      setEventActionMsg('Registration confirmed! HMAC-signed QR ticket generated.');
+      setEventActionMsg('Registration confirmed! Signed HMAC QR VIP Pass generated.');
       loadEvents();
     } catch (err: any) {
       setEventActionMsg(`Error: ${err.message}`);
@@ -574,7 +690,7 @@ export function App() {
 
   const navigationItems = [
     { id: 'events', label: 'Events & Discovery', icon: Calendar, badge: events.length },
-    { id: 'organizations', label: 'Communities & Orgs', icon: Users, badge: orgs.length },
+    { id: 'organizations', label: 'Communities & Hubs', icon: Users, badge: orgs.length },
     { id: 'collaborations', label: 'Co-Host & Workspace', icon: Handshake },
     { id: 'outreach', label: 'Audience Outreach', icon: Send },
     { id: 'sponsorships', label: 'Sponsorships CRM', icon: Briefcase },
@@ -585,51 +701,58 @@ export function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950">
-      {/* Ambient background glow */}
+    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950 relative overflow-x-hidden">
+      {/* Dynamic Ambient Blur Lights */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-emerald-600/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-indigo-600/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 left-1/3 w-96 h-96 bg-teal-600/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] glow-orb-emerald rounded-full animate-pulse-slow" />
+        <div className="absolute top-1/3 -right-40 w-[500px] h-[500px] glow-orb-purple rounded-full animate-pulse-slow" />
+        <div className="absolute -bottom-40 left-1/3 w-[600px] h-[600px] glow-orb-blue rounded-full animate-pulse-slow" />
       </div>
 
-      {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-slate-950/80 backdrop-blur-xl border-b border-slate-800/80 px-4 md:px-8 py-3.5 shadow-xl">
+      {/* Top Glass Header */}
+      <header className="sticky top-0 z-40 glass-panel-deep px-4 md:px-8 py-3.5 shadow-2xl">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-400 hover:text-white rounded-lg bg-slate-900 border border-slate-800"
+              className="lg:hidden p-2 text-slate-400 hover:text-white rounded-xl bg-slate-900/80 border border-white/10"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
 
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('events')}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 via-teal-500 to-indigo-600 p-0.5 shadow-lg shadow-emerald-500/20">
-                <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
+            <div
+              className="flex items-center space-x-3 cursor-pointer group"
+              onClick={() => setActiveTab('events')}
+            >
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 via-sky-400 to-purple-500 p-0.5 shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-all">
+                <div className="w-full h-full bg-[#030712] rounded-[14px] flex items-center justify-center">
                   <Flame className="w-5 h-5 text-emerald-400" />
                 </div>
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h1 className="text-xl font-extrabold tracking-tight text-white font-mono">EventOps</h1>
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  <h1 className="text-xl font-extrabold tracking-tight text-white font-mono gradient-text-neon">
+                    EventOps
+                  </h1>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
                     MVP v0.8
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium">Community &amp; Event Collaboration Platform</p>
+                <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
+                  Community &amp; Event Collaboration Platform
+                </p>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3.5">
+          <div className="flex items-center space-x-4">
             {health && (
-              <span className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-slate-900/90 text-slate-300 border border-slate-800 shadow-inner">
+              <span className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 shadow-inner">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </span>
-                API Online
+                API Healthy
               </span>
             )}
 
@@ -639,23 +762,23 @@ export function App() {
                   <div className="text-xs font-bold text-white flex items-center gap-1.5 justify-end">
                     {user.name}
                     {isPlatformAdmin && (
-                      <span className="px-1.5 py-0.5 text-[9px] font-mono uppercase bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded">
+                      <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-md">
                         Admin
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-slate-400">{user.email}</div>
+                  <div className="text-[11px] text-slate-400 font-mono">{user.email}</div>
                 </div>
 
-                <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-emerald-500 to-indigo-500 p-0.5 flex items-center justify-center font-bold text-slate-950 text-xs shadow-lg">
-                  <div className="w-full h-full bg-slate-900 rounded-full flex items-center justify-center text-white">
+                <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-emerald-400 to-purple-500 p-0.5 flex items-center justify-center font-bold text-slate-950 text-xs shadow-xl">
+                  <div className="w-full h-full bg-[#030712] rounded-[14px] flex items-center justify-center text-white">
                     {user.name.slice(0, 2).toUpperCase()}
                   </div>
                 </div>
 
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition border border-transparent hover:border-rose-500/20"
+                  className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition border border-transparent hover:border-rose-500/20"
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -669,27 +792,55 @@ export function App() {
       {/* Main Container Layout */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-8 relative z-10 flex flex-col lg:flex-row gap-8">
         {!user ? (
-          /* Authentication Screen */
-          <div className="max-w-md w-full mx-auto my-auto glass-panel border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl" />
+          /* Glassmorphic Authentication Screen with Instant 1-Click Demo Accounts */
+          <div className="max-w-xl w-full mx-auto my-auto glass-panel-deep border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden space-y-6">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-            <div className="text-center mb-8">
-              <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 glow-emerald">
-                <Sparkles className="w-7 h-7" />
+            <div className="text-center space-y-2">
+              <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-purple-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 glow-orb-emerald animate-float">
+                <Sparkles className="w-8 h-8" />
               </div>
-              <h2 className="text-2xl font-bold text-white tracking-tight">Welcome to EventOps</h2>
-              <p className="text-xs text-slate-400 mt-1">
-                Collaborate across communities, host events &amp; request sponsorships securely.
+              <h2 className="text-3xl font-extrabold text-white tracking-tight">
+                EventOps Portal
+              </h2>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                Discover events, co-host with partner communities, and manage sponsorships with zero member PII exposure.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 p-1 bg-slate-950/80 rounded-xl mb-6 border border-slate-800">
+            {/* Instant Demo Accounts Quick Sign-In Bar */}
+            <div className="p-4 bg-slate-950/80 border border-emerald-500/30 rounded-2xl space-y-3">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-emerald-400 flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-emerald-400" />
+                  1-Click Instant Demo Sign In
+                </span>
+                <span className="text-[10px] text-slate-400 font-mono">No Setup Needed</span>
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {DEMO_ACCOUNTS.slice(0, 4).map((demo) => (
+                  <button
+                    key={demo.email}
+                    type="button"
+                    onClick={() => handleQuickDemoSignIn(demo)}
+                    className="p-2.5 bg-slate-900/90 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-500/40 rounded-xl text-left transition flex flex-col justify-between group"
+                  >
+                    <span className="text-xs font-bold text-white group-hover:text-emerald-300 transition">
+                      {demo.label}
+                    </span>
+                    <span className="text-[10px] text-slate-500 truncate mt-0.5">{demo.desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 p-1 bg-slate-950/90 rounded-2xl border border-white/10">
               <button
                 type="button"
                 onClick={() => setAuthMode('login')}
-                className={`py-2 text-xs font-bold rounded-lg transition ${
+                className={`py-2.5 text-xs font-bold rounded-xl transition ${
                   authMode === 'login'
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-950'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -698,25 +849,25 @@ export function App() {
               <button
                 type="button"
                 onClick={() => setAuthMode('register')}
-                className={`py-2 text-xs font-bold rounded-lg transition ${
+                className={`py-2.5 text-xs font-bold rounded-xl transition ${
                   authMode === 'register'
-                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-950'
+                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-950'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Create Account
+                Register Custom Account
               </button>
             </div>
 
             {authError && (
-              <div className="mb-4 p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center space-x-2">
-                <X className="w-4 h-4 shrink-0" />
+              <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center space-x-2">
+                <ShieldAlert className="w-4 h-4 shrink-0" />
                 <span>{authError}</span>
               </div>
             )}
 
             {authSuccess && (
-              <div className="mb-4 p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs flex items-center space-x-2">
+              <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs flex items-center space-x-2">
                 <CheckCircle2 className="w-4 h-4 shrink-0" />
                 <span>{authSuccess}</span>
               </div>
@@ -731,8 +882,8 @@ export function App() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="organizer@eventops.local"
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    placeholder="organizer@summit.org"
+                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
                   />
                 </div>
                 <div>
@@ -742,16 +893,16 @@ export function App() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    placeholder="••••••••"
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    placeholder="Password123!"
+                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
                   />
                 </div>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs transition shadow-xl shadow-emerald-950/50 disabled:opacity-50 mt-2"
+                  className="w-full py-3 px-4 glass-button-primary text-white font-bold rounded-xl text-xs transition shadow-xl disabled:opacity-50 mt-2"
                 >
-                  {isSubmitting ? 'Authenticating...' : 'Sign In to Dashboard'}
+                  {isSubmitting ? 'Signing in...' : 'Sign In to Portal'}
                 </button>
               </form>
             ) : (
@@ -763,8 +914,8 @@ export function App() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    placeholder="Alex Morgan"
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    placeholder="Olivia Organizer"
+                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
                   />
                 </div>
                 <div>
@@ -774,8 +925,8 @@ export function App() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="alex@techcommunity.org"
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    placeholder="organizer@summit.org"
+                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
                   />
                 </div>
                 <div>
@@ -786,7 +937,7 @@ export function App() {
                     onChange={(e) => setPassword(e.target.value)}
                     required
                     placeholder="••••••••"
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
                   />
                 </div>
                 <div>
@@ -796,10 +947,10 @@ export function App() {
                       (role) => (
                         <label
                           key={role}
-                          className={`flex items-center space-x-2 p-2 rounded-lg border cursor-pointer transition ${
+                          className={`flex items-center space-x-2 p-2.5 rounded-xl border cursor-pointer transition ${
                             selectedRoles.includes(role)
-                              ? 'bg-emerald-500/10 border-emerald-500/50 text-emerald-300 font-semibold'
-                              : 'bg-slate-950/60 border-slate-800 text-slate-400 hover:text-slate-200'
+                              ? 'bg-emerald-500/15 border-emerald-500/60 text-emerald-300 font-semibold'
+                              : 'bg-slate-950/60 border-white/10 text-slate-400 hover:text-slate-200'
                           }`}
                         >
                           <input
@@ -817,22 +968,12 @@ export function App() {
                     )}
                   </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Interests</label>
-                  <input
-                    type="text"
-                    value={interestsInput}
-                    onChange={(e) => setInterestsInput(e.target.value)}
-                    placeholder="react, devops, AI"
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
-                  />
-                </div>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold rounded-xl text-xs transition shadow-xl shadow-emerald-950/50 disabled:opacity-50 mt-2"
+                  className="w-full py-3 px-4 glass-button-primary text-white font-bold rounded-xl text-xs transition shadow-xl disabled:opacity-50 mt-2"
                 >
-                  {isSubmitting ? 'Creating account...' : 'Complete Registration'}
+                  {isSubmitting ? 'Creating Account...' : 'Complete Registration'}
                 </button>
               </form>
             )}
@@ -840,18 +981,18 @@ export function App() {
         ) : (
           /* Logged In Dashboard Layout */
           <>
-            {/* Sidebar Navigation */}
+            {/* Glass Sidebar Navigation */}
             <aside
-              className={`fixed inset-y-0 left-0 z-30 w-64 glass-panel border-r border-slate-800 p-4 transform transition-transform duration-300 lg:relative lg:translate-x-0 rounded-2xl shrink-0 ${
+              className={`fixed inset-y-0 left-0 z-30 w-64 glass-panel-deep border-r border-white/10 p-4 transform transition-transform duration-300 lg:relative lg:translate-x-0 rounded-3xl shrink-0 ${
                 mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
               <div className="space-y-6">
                 <div>
-                  <div className="text-[10px] font-mono font-semibold uppercase tracking-wider text-slate-500 px-3 mb-2">
-                    Navigation Menu
+                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 px-3 mb-2">
+                    Platform Navigation
                   </div>
-                  <nav className="space-y-1">
+                  <nav className="space-y-1.5">
                     {navigationItems.map((item) => {
                       const Icon = item.icon;
                       const isActive = activeTab === item.id;
@@ -862,18 +1003,18 @@ export function App() {
                             setActiveTab(item.id as any);
                             setMobileMenuOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition ${
+                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${
                             isActive
-                              ? 'bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-400 border border-emerald-500/30 shadow-md'
-                              : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
+                              ? 'bg-gradient-to-r from-emerald-500/20 via-teal-500/10 to-indigo-500/10 text-emerald-300 border border-emerald-500/40 shadow-lg shadow-emerald-950/30'
+                              : 'text-slate-400 hover:text-white hover:bg-white/5'
                           }`}
                         >
-                          <div className="flex items-center space-x-2.5">
+                          <div className="flex items-center space-x-3">
                             <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
                             <span>{item.label}</span>
                           </div>
                           {item.badge !== undefined && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-900 border border-slate-800 text-slate-300">
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-950/80 border border-slate-800 text-emerald-400">
                               {item.badge}
                             </span>
                           )}
@@ -883,34 +1024,34 @@ export function App() {
                   </nav>
                 </div>
 
-                {/* Quick Actions Card */}
-                <div className="p-3.5 bg-slate-950/80 border border-slate-800/80 rounded-xl space-y-2">
-                  <div className="text-[11px] font-bold text-white flex items-center justify-between">
-                    <span>Quick Actions</span>
+                {/* Quick Launchpad */}
+                <div className="p-4 bg-slate-950/70 border border-white/10 rounded-2xl space-y-2.5">
+                  <div className="text-xs font-bold text-white flex items-center justify-between">
+                    <span>Quick Launchpad</span>
                     <Sparkles className="w-3.5 h-3.5 text-amber-400" />
                   </div>
                   <button
                     onClick={() => setShowCreateEventModal(true)}
-                    className="w-full py-2 px-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-semibold rounded-lg transition border border-emerald-500/30 flex items-center justify-center space-x-1.5"
+                    className="w-full py-2.5 px-3 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-bold rounded-xl transition border border-emerald-500/30 flex items-center justify-center space-x-2"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-4 h-4" />
                     <span>Host New Event</span>
                   </button>
                   <button
                     onClick={() => setShowCreateOrgModal(true)}
-                    className="w-full py-2 px-3 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-lg transition border border-slate-800 flex items-center justify-center space-x-1.5"
+                    className="w-full py-2.5 px-3 bg-slate-900/90 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-xl transition border border-white/10 flex items-center justify-center space-x-2"
                   >
-                    <UserPlus className="w-3.5 h-3.5" />
-                    <span>Create Org / Chapter</span>
+                    <UserPlus className="w-4 h-4" />
+                    <span>Register Org / Chapter</span>
                   </button>
                 </div>
               </div>
             </aside>
 
-            {/* Main Content Pane */}
+            {/* Main Content Area */}
             <div className="flex-1 space-y-6 min-w-0">
               {eventActionMsg && (
-                <div className="p-4 glass-panel border border-emerald-500/30 rounded-2xl text-emerald-400 text-xs flex justify-between items-center shadow-xl">
+                <div className="p-4 glass-panel-deep border border-emerald-500/40 rounded-2xl text-emerald-400 text-xs flex justify-between items-center shadow-xl">
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
                     <span>{eventActionMsg}</span>
@@ -925,55 +1066,53 @@ export function App() {
               {activeTab === 'events' && (
                 <div className="space-y-6">
                   {/* Hero Banner */}
-                  <div className="relative glass-panel border border-slate-800 rounded-3xl p-6 md:p-8 overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-emerald-500/10 to-indigo-500/10 rounded-full blur-3xl" />
+                  <div className="relative glass-panel-deep border border-white/10 rounded-3xl p-8 overflow-hidden shadow-2xl">
+                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-500/15 via-teal-500/15 to-purple-500/15 rounded-full blur-3xl pointer-events-none" />
                     <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                      <div className="space-y-2">
-                        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                          <Flame className="w-3.5 h-3.5" />
-                          <span>Luma &amp; Partiful Inspired Discovery</span>
+                      <div className="space-y-3">
+                        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                          <Flame className="w-4 h-4 text-emerald-400" />
+                          <span>Luma &amp; Partiful Inspired Event Hub</span>
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight">
-                          Explore Events &amp; Tech Summits
+                        <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
+                          Discover Tech Summits &amp; Meetups
                         </h2>
-                        <p className="text-xs text-slate-400 max-w-xl">
-                          RSVP for upcoming offline &amp; virtual gatherings, receive HMAC-signed ticket passes, and earn verified attendance certificates.
+                        <p className="text-xs text-slate-400 max-w-xl leading-relaxed">
+                          RSVP for upcoming offline &amp; virtual gatherings, receive HMAC-signed VIP ticket passes, and earn verified attendance credentials.
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => setShowCreateEventModal(true)}
-                          className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-emerald-950 flex items-center space-x-2"
-                        >
-                          <Plus className="w-4 h-4" />
-                          <span>Create Event</span>
-                        </button>
-                      </div>
+                      <button
+                        onClick={() => setShowCreateEventModal(true)}
+                        className="px-5 py-3 glass-button-primary text-white font-bold text-xs rounded-2xl transition flex items-center space-x-2 shrink-0"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span>Create Event</span>
+                      </button>
                     </div>
                   </div>
 
-                  {/* Filter & Search Bar */}
-                  <div className="glass-panel p-4 border border-slate-800 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+                  {/* Filter & Search Controls */}
+                  <div className="glass-panel-deep p-4 border border-white/10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
                     <div className="relative w-full md:w-80">
-                      <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-500" />
+                      <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
                       <input
                         type="text"
                         value={searchEventQuery}
                         onChange={(e) => setSearchEventQuery(e.target.value)}
                         placeholder="Search event title, location..."
-                        className="w-full pl-10 pr-4 py-2 glass-input rounded-xl text-xs"
+                        className="w-full pl-10 pr-4 py-2.5 glass-input-glow rounded-xl text-xs"
                       />
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                      <div className="flex items-center space-x-1.5">
+                      <div className="flex items-center space-x-2">
                         <Filter className="w-3.5 h-3.5 text-slate-400" />
                         <span className="text-xs text-slate-400">Category:</span>
                         <select
                           value={eventCategoryFilter}
                           onChange={(e) => setEventCategoryFilter(e.target.value)}
-                          className="px-3 py-1.5 glass-input rounded-xl text-xs"
+                          className="px-3 py-1.5 glass-input-glow rounded-xl text-xs"
                         >
                           <option value="all">All Categories</option>
                           <option value={EventCategory.TECH}>Tech</option>
@@ -984,12 +1123,12 @@ export function App() {
                         </select>
                       </div>
 
-                      <div className="flex items-center space-x-1.5">
+                      <div className="flex items-center space-x-2">
                         <span className="text-xs text-slate-400">Format:</span>
                         <select
                           value={eventFormatFilter}
                           onChange={(e) => setEventFormatFilter(e.target.value)}
-                          className="px-3 py-1.5 glass-input rounded-xl text-xs"
+                          className="px-3 py-1.5 glass-input-glow rounded-xl text-xs"
                         >
                           <option value="all">All Formats</option>
                           <option value={EventFormat.OFFLINE}>Offline</option>
@@ -999,30 +1138,33 @@ export function App() {
                     </div>
                   </div>
 
-                  {/* Event Grid */}
+                  {/* Glass Event Cards Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredEvents.length === 0 ? (
-                      <div className="col-span-full py-16 text-center glass-panel rounded-3xl border border-slate-800 text-slate-500 text-xs">
-                        No events found matching current search criteria.
+                      <div className="col-span-full py-20 text-center glass-panel-deep rounded-3xl border border-white/10 text-slate-500 text-xs">
+                        No events found matching search filters.
                       </div>
                     ) : (
                       filteredEvents.map((ev) => {
                         const startDate = new Date(ev.start_date);
                         const isPublished = ev.status === EventStatus.PUBLISHED;
                         return (
-                          <div key={ev.id} className="glass-card rounded-3xl p-5 flex flex-col justify-between relative overflow-hidden group">
+                          <div
+                            key={ev.id}
+                            className="glass-card-neon rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group"
+                          >
                             <div className="space-y-4">
                               <div className="flex items-start justify-between gap-3">
                                 <div className="flex items-center space-x-2">
-                                  <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                                  <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
                                     {ev.category}
                                   </span>
-                                  <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+                                  <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
                                     {ev.format}
                                   </span>
                                 </div>
                                 <span
-                                  className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase border ${
+                                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border ${
                                     isPublished
                                       ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
                                       : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
@@ -1033,34 +1175,39 @@ export function App() {
                               </div>
 
                               <div>
-                                <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition line-clamp-1">
+                                <h3 className="text-lg font-extrabold text-white group-hover:text-emerald-300 transition line-clamp-1">
                                   {ev.title}
                                 </h3>
-                                <p className="text-xs text-slate-400 mt-1 line-clamp-2">{ev.description}</p>
+                                <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
+                                  {ev.description}
+                                </p>
                               </div>
 
-                              <div className="space-y-2 text-xs text-slate-400">
+                              <div className="space-y-2 text-xs text-slate-400 pt-1">
                                 <div className="flex items-center space-x-2">
-                                  <Clock className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                                  <span>{startDate.toLocaleDateString()} at {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                  <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
+                                  <span>
+                                    {startDate.toLocaleDateString()} at{' '}
+                                    {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                  </span>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                  <MapPin className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                                  <span className="truncate">{ev.location || 'Virtual Link'}</span>
+                                  <MapPin className="w-4 h-4 text-indigo-400 shrink-0" />
+                                  <span className="truncate">{ev.location || 'Virtual Platform'}</span>
                                 </div>
                               </div>
 
                               {/* Capacity Bar */}
-                              <div className="space-y-1">
+                              <div className="space-y-1.5 pt-2">
                                 <div className="flex justify-between text-[11px] text-slate-400">
-                                  <span>Capacity Utilization</span>
-                                  <span className="font-mono text-emerald-400">
+                                  <span>Seats Reserved</span>
+                                  <span className="font-mono text-emerald-400 font-bold">
                                     {ev.registered_count} / {ev.capacity}
                                   </span>
                                 </div>
-                                <div className="w-full bg-slate-950 h-2 rounded-full overflow-hidden border border-slate-800">
+                                <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-white/10 p-0.5">
                                   <div
-                                    className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all"
+                                    className="bg-gradient-to-r from-emerald-400 to-indigo-500 h-full rounded-full transition-all duration-500"
                                     style={{
                                       width: `${Math.min(100, (ev.registered_count / ev.capacity) * 100)}%`,
                                     }}
@@ -1069,21 +1216,21 @@ export function App() {
                               </div>
                             </div>
 
-                            <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center gap-2">
+                            <div className="pt-5 mt-5 border-t border-white/10 flex items-center gap-2">
                               {isPublished ? (
                                 <button
                                   onClick={() => handleRegisterEvent(ev.id)}
-                                  className="flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-emerald-950/40 flex items-center justify-center space-x-1.5"
+                                  className="flex-1 py-2.5 px-3 glass-button-primary text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2"
                                 >
-                                  <Ticket className="w-3.5 h-3.5" />
-                                  <span>RSVP / Register</span>
+                                  <Ticket className="w-4 h-4" />
+                                  <span>RSVP Now</span>
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => handlePublishEvent(ev.id)}
-                                  className="flex-1 py-2 px-3 bg-amber-600/20 hover:bg-amber-600/30 text-amber-400 font-bold text-xs rounded-xl transition border border-amber-500/30 flex items-center justify-center space-x-1.5"
+                                  className="flex-1 py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs rounded-xl transition border border-amber-500/30 flex items-center justify-center space-x-2"
                                 >
-                                  <Sparkles className="w-3.5 h-3.5" />
+                                  <Sparkles className="w-4 h-4" />
                                   <span>Publish Event</span>
                                 </button>
                               )}
@@ -1093,7 +1240,7 @@ export function App() {
                                   setCheckInEventId(ev.id);
                                   setShowCheckInModal(true);
                                 }}
-                                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-semibold rounded-xl transition border border-slate-800"
+                                className="px-3.5 py-2.5 glass-button-secondary text-slate-300 text-xs font-bold rounded-xl"
                                 title="Organizer Entrance Scanner"
                               >
                                 Check-In
@@ -1107,28 +1254,28 @@ export function App() {
                 </div>
               )}
 
-              {/* TAB 2: COMMUNITIES & ORGANIZATIONS HUB */}
+              {/* TAB 2: COMMUNITIES HUB */}
               {activeTab === 'organizations' && (
                 <div className="space-y-6">
-                  <div className="glass-panel p-6 border border-slate-800 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
+                  <div className="glass-panel-deep p-6 border border-white/10 rounded-3xl flex flex-col md:flex-row items-center justify-between gap-4">
                     <div>
-                      <h2 className="text-2xl font-bold text-white tracking-tight">Communities &amp; Organizations</h2>
+                      <h2 className="text-2xl font-extrabold text-white tracking-tight">Communities &amp; Hubs</h2>
                       <p className="text-xs text-slate-400 mt-1">
-                        Join chapters as a verified member or follow communities for public event broadcasts.
+                        Join chapters as a verified member or follow communities for public event updates.
                       </p>
                     </div>
 
                     <button
                       onClick={() => setShowCreateOrgModal(true)}
-                      className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-950 flex items-center space-x-2"
+                      className="px-5 py-3 glass-button-primary text-white font-bold text-xs rounded-2xl flex items-center space-x-2"
                     >
                       <Plus className="w-4 h-4" />
-                      <span>Create Community / Org</span>
+                      <span>Create Community / Hub</span>
                     </button>
                   </div>
 
                   {orgActionMsg && (
-                    <div className="p-3.5 glass-panel border border-emerald-500/30 rounded-xl text-emerald-400 text-xs flex justify-between items-center">
+                    <div className="p-4 glass-panel-deep border border-emerald-500/40 rounded-xl text-emerald-400 text-xs flex justify-between items-center">
                       <span>{orgActionMsg}</span>
                       <button onClick={() => setOrgActionMsg(null)} className="text-slate-400 hover:text-white">
                         &times;
@@ -1137,19 +1284,19 @@ export function App() {
                   )}
 
                   {/* Filter Bar */}
-                  <div className="glass-panel p-4 border border-slate-800 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="glass-panel-deep p-4 border border-white/10 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
                     <input
                       type="text"
                       value={searchOrgQuery}
                       onChange={(e) => setSearchOrgQuery(e.target.value)}
                       placeholder="Search community name..."
-                      className="w-full sm:w-72 px-3.5 py-2 glass-input rounded-xl text-xs"
+                      className="w-full sm:w-80 px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                     />
 
                     <select
                       value={orgTypeFilter}
                       onChange={(e) => setOrgTypeFilter(e.target.value)}
-                      className="px-3 py-1.5 glass-input rounded-xl text-xs w-full sm:w-auto"
+                      className="px-4 py-2.5 glass-input-glow rounded-xl text-xs w-full sm:w-auto"
                     >
                       <option value="all">All Types</option>
                       <option value={OrganizationType.COMMUNITY}>Community</option>
@@ -1162,22 +1309,22 @@ export function App() {
                   {/* Org Grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredOrgs.map((o) => (
-                      <div key={o.id} className="glass-card rounded-3xl p-5 flex flex-col justify-between">
-                        <div className="space-y-3">
+                      <div key={o.id} className="glass-card-neon rounded-3xl p-6 flex flex-col justify-between">
+                        <div className="space-y-4">
                           <div className="flex items-center justify-between">
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-indigo-500/10 text-indigo-400 border border-indigo-500/30">
+                            <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
                               {o.type}
                             </span>
                             {o.verified && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center space-x-1">
-                                <ShieldCheck className="w-3 h-3" />
+                              <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center space-x-1">
+                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                                 <span>Verified</span>
                               </span>
                             )}
                           </div>
 
-                          <h3 className="text-base font-bold text-white">{o.name}</h3>
-                          <p className="text-xs text-slate-400 line-clamp-2">{o.description}</p>
+                          <h3 className="text-lg font-extrabold text-white">{o.name}</h3>
+                          <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">{o.description}</p>
 
                           <div className="flex items-center space-x-3 text-xs text-slate-400 font-mono pt-2">
                             <span><strong className="text-emerald-400">{o.member_count}</strong> members</span>
@@ -1186,16 +1333,16 @@ export function App() {
                           </div>
                         </div>
 
-                        <div className="pt-4 mt-4 border-t border-slate-800/80 flex items-center gap-2">
+                        <div className="pt-5 mt-5 border-t border-white/10 flex items-center gap-2">
                           <button
                             onClick={() => handleJoinOrg(o.id)}
-                            className="flex-1 py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 font-bold text-xs rounded-xl transition border border-emerald-500/30"
+                            className="flex-1 py-2.5 glass-button-primary text-white font-bold text-xs rounded-xl"
                           >
                             Join Member
                           </button>
                           <button
                             onClick={() => handleFollowOrg(o.id)}
-                            className="flex-1 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold text-xs rounded-xl transition border border-slate-800"
+                            className="flex-1 py-2.5 glass-button-secondary text-slate-300 font-bold text-xs rounded-xl"
                           >
                             Follow
                           </button>
@@ -1248,13 +1395,13 @@ export function App() {
               {/* TAB 8: CERTIFICATE VERIFICATION PORTAL */}
               {activeTab === 'certificates' && (
                 <div className="space-y-6">
-                  <div className="glass-panel p-8 border border-slate-800 rounded-3xl max-w-2xl mx-auto text-center space-y-4">
-                    <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto glow-emerald">
-                      <ShieldCheck className="w-8 h-8" />
+                  <div className="glass-panel-deep p-10 border border-white/10 rounded-3xl max-w-2xl mx-auto text-center space-y-5">
+                    <div className="w-20 h-20 rounded-3xl bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 mx-auto glow-orb-emerald animate-float">
+                      <ShieldCheck className="w-10 h-10" />
                     </div>
-                    <h2 className="text-2xl font-bold text-white tracking-tight">Public Certificate Verification Portal</h2>
-                    <p className="text-xs text-slate-400 max-w-md mx-auto">
-                      Verify the authenticity of EventOps attendee credentials and certificates of completion.
+                    <h2 className="text-3xl font-extrabold text-white tracking-tight">Certificate Verification Portal</h2>
+                    <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                      Verify the cryptographic authenticity of EventOps attendee credentials and certificates.
                     </p>
 
                     <form onSubmit={handleVerifyCertificate} className="flex gap-2 max-w-md mx-auto pt-2">
@@ -1264,21 +1411,21 @@ export function App() {
                         onChange={(e) => setVerifyIdInput(e.target.value)}
                         placeholder="e.g. EO-CERT-1711234567-A1B2"
                         required
-                        className="flex-1 px-4 py-2.5 glass-input rounded-xl text-xs font-mono"
+                        className="flex-1 px-4 py-3 glass-input-glow rounded-xl text-xs font-mono"
                       />
                       <button
                         type="submit"
                         disabled={certLoading}
-                        className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition shadow-lg shadow-emerald-950"
+                        className="px-5 py-3 glass-button-primary text-white font-bold text-xs rounded-xl shadow-lg"
                       >
                         {certLoading ? 'Verifying...' : 'Verify'}
                       </button>
                     </form>
 
                     {certificateData && (
-                      <div className="mt-6 text-left p-6 glass-panel rounded-2xl border border-slate-800 space-y-4">
+                      <div className="mt-8 text-left p-6 glass-panel-deep rounded-2xl border border-white/10 space-y-4 shadow-2xl">
                         {certificateData.valid ? (
-                          <div className="space-y-3">
+                          <div className="space-y-4">
                             <div className="flex items-center space-x-2 text-emerald-400 font-bold text-sm">
                               <CheckCircle2 className="w-5 h-5" />
                               <span>OFFICIAL VERIFIED CERTIFICATE</span>
@@ -1286,19 +1433,19 @@ export function App() {
                             <div className="grid grid-cols-2 gap-4 text-xs">
                               <div>
                                 <span className="text-slate-500">Attendee:</span>
-                                <div className="font-bold text-white">{certificateData.certificate?.attendee_name}</div>
+                                <div className="font-bold text-white text-sm mt-0.5">{certificateData.certificate?.attendee_name}</div>
                               </div>
                               <div>
                                 <span className="text-slate-500">Event Title:</span>
-                                <div className="font-bold text-white">{certificateData.certificate?.event_title}</div>
+                                <div className="font-bold text-white text-sm mt-0.5">{certificateData.certificate?.event_title}</div>
                               </div>
                               <div>
                                 <span className="text-slate-500">Issued By:</span>
-                                <div className="font-bold text-emerald-400">{certificateData.certificate?.organizer_name}</div>
+                                <div className="font-bold text-emerald-400 text-sm mt-0.5">{certificateData.certificate?.organizer_name}</div>
                               </div>
                               <div>
                                 <span className="text-slate-500">Verification ID:</span>
-                                <div className="font-mono text-slate-300">{certificateData.certificate?.verification_id}</div>
+                                <div className="font-mono text-slate-300 mt-0.5">{certificateData.certificate?.verification_id}</div>
                               </div>
                             </div>
                           </div>
@@ -1316,32 +1463,32 @@ export function App() {
               {/* TAB 9: PROFILE & ROLES */}
               {activeTab === 'profile' && user && (
                 <div className="space-y-6 max-w-3xl mx-auto">
-                  <div className="glass-panel p-6 border border-slate-800 rounded-3xl space-y-6">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-indigo-600 p-0.5 flex items-center justify-center font-bold text-slate-950 text-xl shadow-xl">
-                        <div className="w-full h-full bg-slate-950 rounded-2xl flex items-center justify-center text-white">
+                  <div className="glass-panel-deep p-8 border border-white/10 rounded-3xl space-y-6">
+                    <div className="flex items-center space-x-5">
+                      <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-emerald-400 via-teal-400 to-purple-500 p-0.5 flex items-center justify-center font-bold text-slate-950 text-2xl shadow-xl">
+                        <div className="w-full h-full bg-[#030712] rounded-[22px] flex items-center justify-center text-white">
                           {user.name.slice(0, 2).toUpperCase()}
                         </div>
                       </div>
                       <div>
-                        <h2 className="text-xl font-bold text-white">{user.name}</h2>
-                        <p className="text-xs text-slate-400">{user.email}</p>
+                        <h2 className="text-2xl font-extrabold text-white">{user.name}</h2>
+                        <p className="text-xs text-slate-400 font-mono mt-0.5">{user.email}</p>
                       </div>
                     </div>
 
                     {profileMsg && (
-                      <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs">
+                      <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs">
                         {profileMsg}
                       </div>
                     )}
 
                     <div>
-                      <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Assigned Roles</h3>
+                      <h3 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5">Assigned Roles</h3>
                       <div className="flex flex-wrap gap-2">
                         {roles.map((r) => (
                           <span
                             key={r.id}
-                            className="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                            className="px-3.5 py-1.5 rounded-full text-xs font-mono font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
                           >
                             {r.role_type}
                           </span>
@@ -1349,20 +1496,20 @@ export function App() {
                       </div>
                     </div>
 
-                    <form onSubmit={handleAssignRole} className="space-y-3 pt-4 border-t border-slate-800">
+                    <form onSubmit={handleAssignRole} className="space-y-3 pt-6 border-t border-white/10">
                       <label className="block text-xs font-semibold text-slate-300">Assign Additional Role</label>
                       <div className="flex gap-2">
                         <select
                           value={selectedNewRole}
                           onChange={(e) => setSelectedNewRole(e.target.value as RoleType)}
-                          className="flex-1 px-3 py-2 glass-input rounded-xl text-xs"
+                          className="flex-1 px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                         >
                           <option value={RoleType.ORGANIZER}>ORGANIZER</option>
                           <option value={RoleType.COMMUNITY_ADMIN}>COMMUNITY_ADMIN</option>
                           <option value={RoleType.SPONSOR}>SPONSOR</option>
                           <option value={RoleType.VENUE_OWNER}>VENUE_OWNER</option>
                         </select>
-                        <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition">
+                        <button type="submit" className="px-5 py-2.5 glass-button-primary text-white font-bold text-xs rounded-xl shadow-lg">
                           Assign Role
                         </button>
                       </div>
@@ -1377,19 +1524,19 @@ export function App() {
 
       {/* MODAL 1: TICKET DISPLAY WITH SIGNED QR CODE */}
       {activeTicket && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel border border-emerald-500/40 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center relative overflow-hidden">
-            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-500 to-indigo-500" />
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel-deep border border-emerald-500/40 rounded-3xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-center relative overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-500" />
             <div className="flex justify-between items-center">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                VIP TICKET PASS
+              <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
+                VIP SIGNED PASS
               </span>
               <button onClick={() => setActiveTicket(null)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-4 bg-white rounded-2xl inline-block shadow-xl">
+            <div className="p-4 bg-white rounded-2xl inline-block shadow-2xl">
               <img src={activeTicket.ticket.qr_code_data_url} alt="HMAC Signed QR Code" className="w-48 h-48 mx-auto" />
             </div>
 
@@ -1402,7 +1549,7 @@ export function App() {
 
             <button
               onClick={() => setActiveTicket(null)}
-              className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg transition"
+              className="w-full py-3 glass-button-primary text-white font-bold text-xs rounded-xl shadow-lg"
             >
               Done
             </button>
@@ -1412,9 +1559,9 @@ export function App() {
 
       {/* MODAL 2: ORGANIZER CHECK-IN SCANNER */}
       {showCheckInModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel-deep border border-white/10 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-white/10">
               <h3 className="font-bold text-white text-base">Organizer Check-In Terminal</h3>
               <button onClick={() => setShowCheckInModal(false)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -1430,7 +1577,7 @@ export function App() {
                   value={qrInputPayload}
                   onChange={(e) => setQrInputPayload(e.target.value)}
                   placeholder="Paste QR payload string or ticket code..."
-                  className="w-full p-3 glass-input rounded-xl text-xs font-mono"
+                  className="w-full p-3 glass-input-glow rounded-xl text-xs font-mono"
                 />
               </div>
 
@@ -1439,7 +1586,7 @@ export function App() {
                 <select
                   value={checkInStatusTarget}
                   onChange={(e) => setCheckInStatusTarget(e.target.value as RegistrationStatus)}
-                  className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                  className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                 >
                   <option value={RegistrationStatus.CHECKED_IN}>CHECKED IN (Entrance Verification)</option>
                   <option value={RegistrationStatus.ATTENDED}>ATTENDED (Auto-Issue Certificate)</option>
@@ -1448,21 +1595,21 @@ export function App() {
 
               <button
                 type="submit"
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-lg transition"
+                className="w-full py-3 glass-button-primary text-white font-bold text-xs rounded-xl shadow-lg"
               >
                 Verify HMAC Signature &amp; Transition
               </button>
             </form>
 
             {checkInResult && (
-              <div className="p-4 bg-slate-950/80 rounded-xl border border-slate-800 text-xs">
+              <div className="p-4 bg-slate-950/80 rounded-xl border border-white/10 text-xs">
                 {checkInResult.error ? (
-                  <div className="text-rose-400">❌ {checkInResult.error}</div>
+                  <div className="text-rose-400 font-bold">❌ {checkInResult.error}</div>
                 ) : (
-                  <div className="space-y-2 text-emerald-400">
+                  <div className="space-y-2 text-emerald-400 font-bold">
                     <div>✓ Attendee updated to {checkInResult.registration?.status}!</div>
                     {checkInResult.certificate && (
-                      <div className="p-2 bg-emerald-500/10 border border-emerald-500/30 rounded text-[11px] text-emerald-300">
+                      <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-[11px] text-emerald-300 font-mono">
                         🎓 Certificate Issued: {checkInResult.certificate.verification_id}
                       </div>
                     )}
@@ -1476,9 +1623,9 @@ export function App() {
 
       {/* MODAL 3: CREATE EVENT */}
       {showCreateEventModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel border border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel-deep border border-white/10 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-white/10">
               <h3 className="font-bold text-white text-base">Host New Event</h3>
               <button onClick={() => setShowCreateEventModal(false)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -1492,7 +1639,7 @@ export function App() {
                   value={newEventOrgId}
                   onChange={(e) => setNewEventOrgId(e.target.value)}
                   required
-                  className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                  className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                 >
                   {orgs.map((o) => (
                     <option key={o.id} value={o.id}>
@@ -1510,7 +1657,7 @@ export function App() {
                   value={newEventTitle}
                   onChange={(e) => setNewEventTitle(e.target.value)}
                   placeholder="e.g. Distributed Systems &amp; Cloud Summit"
-                  className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                  className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                 />
               </div>
 
@@ -1521,7 +1668,7 @@ export function App() {
                   value={newEventDesc}
                   onChange={(e) => setNewEventDesc(e.target.value)}
                   placeholder="Keynote topics, speakers, and workshop details..."
-                  className="w-full p-3 glass-input rounded-xl text-xs"
+                  className="w-full p-3 glass-input-glow rounded-xl text-xs"
                 />
               </div>
 
@@ -1531,7 +1678,7 @@ export function App() {
                   <select
                     value={newEventCategory}
                     onChange={(e) => setNewEventCategory(e.target.value as EventCategory)}
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                   >
                     <option value={EventCategory.TECH}>Tech</option>
                     <option value={EventCategory.DESIGN}>Design</option>
@@ -1545,7 +1692,7 @@ export function App() {
                   <select
                     value={newEventFormat}
                     onChange={(e) => setNewEventFormat(e.target.value as EventFormat)}
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                   >
                     <option value={EventFormat.OFFLINE}>Offline</option>
                     <option value={EventFormat.ONLINE}>Online</option>
@@ -1560,7 +1707,7 @@ export function App() {
                     type="text"
                     value={newEventLocation}
                     onChange={(e) => setNewEventLocation(e.target.value)}
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                   />
                 </div>
                 <div>
@@ -1570,14 +1717,14 @@ export function App() {
                     min={1}
                     value={newEventCapacity}
                     onChange={(e) => setNewEventCapacity(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                    className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                   />
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition"
+                className="w-full py-3 glass-button-primary text-white font-bold text-xs rounded-xl shadow-lg"
               >
                 Create Event Draft
               </button>
@@ -1588,9 +1735,9 @@ export function App() {
 
       {/* MODAL 4: CREATE ORGANIZATION */}
       {showCreateOrgModal && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="glass-panel border border-slate-800 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
-            <div className="flex justify-between items-center pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="glass-panel-deep border border-white/10 rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4">
+            <div className="flex justify-between items-center pb-3 border-b border-white/10">
               <h3 className="font-bold text-white text-base">Create Community / Organization</h3>
               <button onClick={() => setShowCreateOrgModal(false)} className="text-slate-400 hover:text-white">
                 <X className="w-5 h-5" />
@@ -1606,7 +1753,7 @@ export function App() {
                   value={newOrgName}
                   onChange={(e) => setNewOrgName(e.target.value)}
                   placeholder="e.g. React Berlin Chapter"
-                  className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                  className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                 />
               </div>
 
@@ -1615,7 +1762,7 @@ export function App() {
                 <select
                   value={newOrgType}
                   onChange={(e) => setNewOrgType(e.target.value as OrganizationType)}
-                  className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                  className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                 >
                   <option value={OrganizationType.COMMUNITY}>Community</option>
                   <option value={OrganizationType.COMPANY}>Company</option>
@@ -1632,7 +1779,7 @@ export function App() {
                   value={newOrgDesc}
                   onChange={(e) => setNewOrgDesc(e.target.value)}
                   placeholder="Describe your community mission..."
-                  className="w-full p-3 glass-input rounded-xl text-xs"
+                  className="w-full p-3 glass-input-glow rounded-xl text-xs"
                 />
               </div>
 
@@ -1643,13 +1790,13 @@ export function App() {
                   value={newOrgWebsite}
                   onChange={(e) => setNewOrgWebsite(e.target.value)}
                   placeholder="https://community.org"
-                  className="w-full px-3.5 py-2.5 glass-input rounded-xl text-xs"
+                  className="w-full px-4 py-2.5 glass-input-glow rounded-xl text-xs"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-lg transition"
+                className="w-full py-3 glass-button-primary text-white font-bold text-xs rounded-xl shadow-lg"
               >
                 Register Organization
               </button>
@@ -1662,4 +1809,3 @@ export function App() {
 }
 
 export default App;
-
