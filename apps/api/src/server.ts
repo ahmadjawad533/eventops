@@ -4,6 +4,11 @@ import { logger } from './core/logger';
 import { prisma } from './core/prisma';
 import { redisClient } from './core/redis';
 
+import { seedMemoryDatabase } from './core/seed';
+
+// Seed memory database with rich demo data across all modules
+seedMemoryDatabase().catch((err) => console.error('Error seeding memory DB:', err));
+
 const server = app.listen(env.PORT, () => {
   logger.info(`🚀 EventOps API running on http://localhost:${env.PORT} in ${env.NODE_ENV} mode`);
 });
