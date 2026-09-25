@@ -249,7 +249,7 @@ export function App() {
   const fetchUserProfile = async () => {
     if (!token) return;
     try {
-      const res = await fetch('/api/users/me', {
+      const res = await fetch('/api/users/profile', {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -440,8 +440,8 @@ export function App() {
 
     try {
       const updatedInterests = [...(user?.interests || []), newTag.trim()];
-      const res = await fetch('/api/users/me/profile', {
-        method: 'PATCH',
+      const res = await fetch('/api/users/profile', {
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -466,7 +466,7 @@ export function App() {
     setProfileMsg(null);
 
     try {
-      const res = await fetch('/api/users/me/roles', {
+      const res = await fetch('/api/users/roles', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -478,7 +478,7 @@ export function App() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error?.message || 'Failed to assign role');
 
-      setRoles(data.data);
+      await fetchUserProfile();
       setProfileMsg(`Role ${selectedNewRole} assigned!`);
     } catch (err: any) {
       setProfileMsg(`Error: ${err.message}`);

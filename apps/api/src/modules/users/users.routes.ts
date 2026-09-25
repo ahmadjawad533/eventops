@@ -9,7 +9,11 @@ import { RoleType } from '@eventops/shared-types';
 const router = Router();
 
 router.get('/profile', authenticateJwt, usersController.getProfile);
+router.get('/me', authenticateJwt, usersController.getProfile);
 router.put('/profile', authenticateJwt, validateBody(updateProfileSchema), usersController.updateProfile);
+router.put('/me', authenticateJwt, validateBody(updateProfileSchema), usersController.updateProfile);
+router.patch('/profile', authenticateJwt, validateBody(updateProfileSchema), usersController.updateProfile);
+router.patch('/me', authenticateJwt, validateBody(updateProfileSchema), usersController.updateProfile);
 router.post('/roles', authenticateJwt, validateBody(assignRoleSchema), usersController.assignRole);
 router.get(
   '/',
