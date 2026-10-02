@@ -705,174 +705,117 @@ export function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#000000] text-zinc-100 flex items-center justify-center p-2 sm:p-4 md:p-6 font-sans selection:bg-zinc-800 selection:text-white">
-      {/* Centered Dashboard Workspace Container matching Screenshot 1 */}
-      <div className="w-full max-w-[1120px] bg-[#0c0c0e] border border-zinc-800/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col min-h-[720px]">
-        {/* Compact Top Header Bar */}
-        <header className="bg-[#121215] border-b border-zinc-800/80 px-4 py-2.5 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 text-zinc-400 hover:text-white rounded-lg bg-zinc-900 border border-zinc-800"
-            >
-              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
-            </button>
-
-            {/* Compact Search Input */}
-            <div className="relative w-56 sm:w-64">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-zinc-500" />
-              <input
-                type="text"
-                value={searchEventQuery}
-                onChange={(e) => setSearchEventQuery(e.target.value)}
-                placeholder="Search..."
-                className="w-full bg-[#18181b] border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 rounded-lg pl-8 pr-3 py-1.5 focus:outline-none focus:border-zinc-600 transition"
-              />
+    <div className="min-h-screen w-full bg-[#000000] text-zinc-100 flex flex-col font-sans selection:bg-zinc-800 selection:text-white">
+      {!user ? (
+        /* Compact Auth Screen */
+        <div className="max-w-md w-full mx-auto my-auto p-6 bg-[#121215] border border-zinc-800 rounded-2xl shadow-xl space-y-4">
+          <div className="text-center space-y-1">
+            <div className="w-10 h-10 mx-auto rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white">
+              <Zap className="w-5 h-5 text-emerald-400" />
             </div>
+            <h2 className="text-xl font-bold text-white">EventOps Portal</h2>
+            <p className="text-xs text-zinc-400">Sign in to access your event dashboard</p>
           </div>
 
-          {/* Status Pill & Action Icons */}
-          <div className="flex items-center space-x-2.5">
-            {health && (
-              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-[11px] font-medium">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Systems Online</span>
-              </div>
-            )}
-
+          <div className="grid grid-cols-2 p-1 bg-zinc-950 rounded-xl border border-zinc-800 text-xs">
             <button
-              className="p-1.5 rounded-lg bg-[#18181b] border border-zinc-800 text-zinc-400 hover:text-white transition relative"
-              title="Notifications"
+              type="button"
+              onClick={() => setAuthMode('login')}
+              className={`py-1.5 font-bold rounded-lg transition ${
+                authMode === 'login' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
+              }`}
             >
-              <Bell className="w-3.5 h-3.5" />
-              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+              Sign In
             </button>
-
             <button
-              className="p-1.5 rounded-lg bg-[#18181b] border border-zinc-800 text-zinc-400 hover:text-white transition"
-              title="Settings"
+              type="button"
+              onClick={() => setAuthMode('register')}
+              className={`py-1.5 font-bold rounded-lg transition ${
+                authMode === 'register' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
+              }`}
             >
-              <Settings className="w-3.5 h-3.5" />
+              Register
             </button>
-
-            <span className="px-2.5 py-1 bg-[#18181b] border border-zinc-800 text-zinc-300 font-mono text-[10px] font-bold tracking-wider rounded-lg uppercase">
-              {roles[0]?.role_type || RoleType.ORGANIZER}
-            </span>
           </div>
-        </header>
 
-        {/* Workspace Body Layout */}
-        <div className="flex flex-1 min-h-0">
-          {!user ? (
-            /* Compact Auth Screen */
-            <div className="max-w-md w-full mx-auto my-auto p-6 bg-[#121215] border border-zinc-800 rounded-2xl shadow-xl space-y-4">
-              <div className="text-center space-y-1">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-emerald-400">
-                  <Zap className="w-5 h-5" />
-                </div>
-                <h2 className="text-xl font-bold text-white">EventOps Portal</h2>
-                <p className="text-xs text-zinc-400">Sign in to access your event dashboard</p>
+          {authError && <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-xs">{authError}</div>}
+          {authSuccess && <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs">{authSuccess}</div>}
+
+          {authMode === 'login' ? (
+            <form onSubmit={handleLogin} className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                />
               </div>
-
-              <div className="grid grid-cols-2 p-1 bg-zinc-950 rounded-xl border border-zinc-800 text-xs">
-                <button
-                  type="button"
-                  onClick={() => setAuthMode('login')}
-                  className={`py-1.5 font-bold rounded-lg transition ${
-                    authMode === 'login' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  Sign In
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAuthMode('register')}
-                  className={`py-1.5 font-bold rounded-lg transition ${
-                    authMode === 'register' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
-                  }`}
-                >
-                  Register
-                </button>
+              <div>
+                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                />
               </div>
-
-              {authError && <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-xs">{authError}</div>}
-              {authSuccess && <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs">{authSuccess}</div>}
-
-              {authMode === 'login' ? (
-                <form onSubmit={handleLogin} className="space-y-3">
-                  <div>
-                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Email</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-2 bg-white text-black font-bold text-xs rounded-lg hover:bg-zinc-200 transition"
-                  >
-                    {isSubmitting ? 'Signing in...' : 'Sign In'}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={handleRegister} className="space-y-3">
-                  <div>
-                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Full Name</label>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Email</label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full py-2 bg-white text-black font-bold text-xs rounded-lg hover:bg-zinc-200 transition"
-                  >
-                    {isSubmitting ? 'Creating Account...' : 'Complete Registration'}
-                  </button>
-                </form>
-              )}
-            </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2 bg-white text-black font-bold text-xs rounded-lg hover:bg-zinc-200 transition"
+              >
+                {isSubmitting ? 'Signing in...' : 'Sign In'}
+              </button>
+            </form>
           ) : (
-            /* Logged In Dashboard Layout matching Screenshot 1 */
-            <>
+            <form onSubmit={handleRegister} className="space-y-3">
+              <div>
+                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-2 bg-white text-black font-bold text-xs rounded-lg hover:bg-zinc-200 transition"
+              >
+                {isSubmitting ? 'Creating Account...' : 'Complete Registration'}
+              </button>
+            </form>
+          )}
+        </div>
+      ) : (
+        /* Full Viewport Width Logged-In Dashboard Layout */
+        <div className="flex flex-1 w-full min-h-screen">
               {/* Narrow 165px Sidebar */}
               <aside
                 className={`fixed inset-y-0 left-0 z-30 w-[165px] bg-[#0c0c0e] border-r border-zinc-800/80 p-3 flex flex-col justify-between shrink-0 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
@@ -1432,10 +1375,8 @@ export function App() {
                 </div>
               )}
             </div>
-          </>
+          </div>
         )}
-        </div>
-      </div>
 
       {/* MODAL 1: TICKET DISPLAY WITH SIGNED QR CODE */}
       {activeTicket && (
