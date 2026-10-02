@@ -1805,6 +1805,25 @@ export function App() {
           </div>
         </div>
       )}
+
+      {/* Vintage Editorial Gazette Footer */}
+      <footer className="mt-16 py-8 border-t-2 border-double border-amber-500/40 glass-panel-deep relative z-10 text-center space-y-3 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-serif-vintage text-amber-300/80">
+          <div className="flex items-center space-x-2">
+            <Flame className="w-4 h-4 text-amber-400" />
+            <span className="font-cinzel font-bold text-amber-100">THE EVENTOPS GAZETTE &amp; CHRONICLE</span>
+            <span className="vintage-stamp text-[9px] text-amber-400">ANNO MMXXVI</span>
+          </div>
+          <div className="text-[11px] italic text-amber-400/60">
+            Published under the Seal of the Global Developer Guild &bull; Edition Vol. MMXXVI
+          </div>
+          <div className="flex items-center space-x-3 text-amber-300/70 font-mono text-[11px]">
+            <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-amber-400" /> Verified Cryptographic Identity</span>
+            <span>&bull;</span>
+            <span>All Rights Reserved</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
