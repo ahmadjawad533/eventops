@@ -14,35 +14,38 @@
   }
 }
 
-/* Compact Dark Obsidian Design System (Strict Screenshot 1 Match) */
+/* Technical Rectangular Obsidian Design System */
 .glass-panel-deep {
-  background: #121215;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  background: #0a0a0d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.9);
 }
 
 .glass-card-neon {
-  background: #121215;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #0a0a0d;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
   transition: all 0.2s ease;
 }
 
 .glass-card-neon:hover {
-  background: #16161a;
-  border-color: rgba(255, 255, 255, 0.18);
+  background: #111115;
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-1px);
 }
 
 .glass-input-glow {
-  background: #161619;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #111115;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 3px;
   color: #ffffff;
   transition: all 0.2s ease;
 }
 
 .glass-input-glow:focus {
-  background: #1a1a1e;
-  border-color: rgba(255, 255, 255, 0.25);
+  background: #16161c;
+  border-color: rgba(255, 255, 255, 0.3);
   outline: none;
 }
 
@@ -56,7 +59,7 @@
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 9999px;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);

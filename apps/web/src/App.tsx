@@ -830,7 +830,7 @@ export function App() {
                       className="flex items-center space-x-2 cursor-pointer"
                       onClick={() => setActiveTab('events')}
                     >
-                      <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-white font-bold">
+                      <div className="w-7 h-7 rounded-sm bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-white font-bold">
                         <Zap className="w-4 h-4 text-white" />
                       </div>
                       <span className="text-sm font-extrabold text-white tracking-tight">EventOps</span>
@@ -855,7 +855,7 @@ export function App() {
                             setActiveTab(item.id as any);
                             setMobileMenuOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition ${
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-sm text-[11px] font-semibold transition ${
                             isActive
                               ? 'bg-white text-black shadow-sm'
                               : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
@@ -874,7 +874,7 @@ export function App() {
                 {/* Sidebar User Profile Section */}
                 {user && (
                   <div className="pt-3 border-t border-zinc-800/80">
-                    <div className="bg-[#141417] border border-zinc-800/80 rounded-lg p-2 flex items-center justify-between">
+                    <div className="bg-[#141417] border border-zinc-800/80 rounded-sm p-2 flex items-center justify-between">
                       <div className="flex items-center space-x-2 truncate">
                         <div className="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
                           {user.name.slice(0, 2).toUpperCase()}
@@ -931,21 +931,21 @@ export function App() {
 
                       {/* Right Action Bar */}
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <button className="px-3 py-1 bg-white text-black text-[11px] font-bold rounded-full shadow-sm">
+                        <button className="px-3 py-1 bg-white text-black text-[11px] font-bold rounded-sm shadow-sm">
                           All
                         </button>
-                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-full text-[11px] transition">
+                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-sm text-[11px] transition">
                           Tech
                         </button>
-                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-full text-[11px] transition">
+                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-sm text-[11px] transition">
                           Workshop
                         </button>
-                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-full text-[11px] transition">
+                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-sm text-[11px] transition">
                           Hackathon
                         </button>
 
                         <button
-                          className="p-1.5 bg-[#141417] border border-zinc-800 text-zinc-400 hover:text-white rounded-lg transition"
+                          className="p-1.5 bg-[#141417] border border-zinc-800 text-zinc-400 hover:text-white rounded-sm transition"
                           title="Filter Options"
                         >
                           <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -953,7 +953,7 @@ export function App() {
 
                         <button
                           onClick={() => setShowCreateEventModal(true)}
-                          className="px-3 py-1.5 bg-white hover:bg-zinc-200 text-black text-[11px] font-bold rounded-lg flex items-center gap-1 transition shadow"
+                          className="px-3 py-1.5 bg-white hover:bg-zinc-200 text-black text-[11px] font-bold rounded-sm flex items-center gap-1 transition shadow"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           <span>Create Event</span>
@@ -969,15 +969,15 @@ export function App() {
                         return (
                           <div
                             key={ev.id}
-                            className="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden flex flex-col justify-between group shadow-sm hover:border-zinc-700 transition"
+                            className="bg-[#0a0a0d] border border-zinc-800 rounded overflow-hidden flex flex-col justify-between group shadow-sm hover:border-zinc-700 transition"
                           >
                             {/* Card Image Banner */}
-                            <div className="h-32 w-full relative overflow-hidden bg-gradient-to-br from-zinc-800 via-zinc-900 to-black border-b border-zinc-800/80 flex items-center justify-center">
+                            <div className="h-32 w-full relative overflow-hidden bg-gradient-to-br from-zinc-800 via-zinc-900 to-black border-b border-zinc-800 flex items-center justify-center">
                               <Calendar className="w-8 h-8 text-zinc-700 opacity-40 group-hover:scale-105 transition duration-300" />
 
                               {/* Format Pill Overlay */}
                               <div className="absolute top-2 left-2 z-10">
-                                <span className="bg-black/70 backdrop-blur-md text-zinc-200 text-[9px] font-semibold px-2 py-0.5 rounded-full border border-white/10">
+                                <span className="bg-black/70 backdrop-blur-md text-zinc-200 text-[9px] font-semibold px-2 py-0.5 rounded-sm border border-white/10">
                                   {ev.format}
                                 </span>
                               </div>

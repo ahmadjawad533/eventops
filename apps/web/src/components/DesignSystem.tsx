@@ -1,7 +1,7 @@
 import React from 'react';
-import { Search, Bell, Settings, Zap } from 'lucide-react';
+import { Search, Bell, Settings } from 'lucide-react';
 
-// Card
+// Card - Rectangular 4px-6px Corner Radius
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   className?: string;
@@ -11,8 +11,8 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 export function Card({ children, className = '', hoverEffect = false, ...props }: CardProps) {
   return (
     <div
-      className={`bg-[#121215] border border-zinc-800/80 rounded-xl p-4 shadow-sm text-zinc-100 font-sans transition ${
-        hoverEffect ? 'hover:border-zinc-700/90 hover:bg-[#16161a] hover:-translate-y-0.5' : ''
+      className={`bg-[#0a0a0d] border border-zinc-800 rounded p-4 shadow-sm text-zinc-100 font-sans transition ${
+        hoverEffect ? 'hover:border-zinc-700 hover:bg-[#101014] hover:-translate-y-0.5' : ''
       } ${className}`}
       {...props}
     >
@@ -21,7 +21,7 @@ export function Card({ children, className = '', hoverEffect = false, ...props }
   );
 }
 
-// Button
+// Button - Rectangular 3px-5px Corner Radius
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'action' | 'danger' | 'outline';
   size?: 'sm' | 'md';
@@ -36,7 +36,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const baseStyle =
-    'inline-flex items-center justify-center font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed select-none';
+    'inline-flex items-center justify-center font-bold rounded-sm transition disabled:opacity-50 disabled:cursor-not-allowed select-none';
   const sizeStyle = size === 'sm' ? 'px-3 py-1.5 text-xs' : 'px-4 py-2 text-xs';
 
   let variantStyle = '';
@@ -45,7 +45,7 @@ export function Button({
       variantStyle = 'bg-white text-black hover:bg-zinc-200 shadow-sm';
       break;
     case 'secondary':
-      variantStyle = 'bg-[#18181b] hover:bg-zinc-800 text-zinc-300 border border-zinc-800';
+      variantStyle = 'bg-[#141417] hover:bg-zinc-800 text-zinc-300 border border-zinc-800';
       break;
     case 'action':
       variantStyle = 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-md';
@@ -65,25 +65,25 @@ export function Button({
   );
 }
 
-// Input
+// Input - Rectangular 3px Corner Radius
 export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {}
 
 export function Input({ className = '', ...props }: InputProps) {
   return (
     <input
-      className={`w-full px-3 py-1.5 bg-[#141417] border border-zinc-800 rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition ${className}`}
+      className={`w-full px-3 py-1.5 bg-[#111115] border border-zinc-800 rounded-sm text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-600 transition ${className}`}
       {...props}
     />
   );
 }
 
-// Select
+// Select - Rectangular 3px Corner Radius
 export interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {}
 
 export function Select({ className = '', children, ...props }: SelectProps) {
   return (
     <select
-      className={`px-3 py-1.5 bg-[#141417] border border-zinc-800 rounded-lg text-xs text-white focus:outline-none focus:border-zinc-600 transition ${className}`}
+      className={`px-3 py-1.5 bg-[#111115] border border-zinc-800 rounded-sm text-xs text-white focus:outline-none focus:border-zinc-600 transition ${className}`}
       {...props}
     >
       {children}
@@ -91,7 +91,7 @@ export function Select({ className = '', children, ...props }: SelectProps) {
   );
 }
 
-// Badge
+// Badge - Compact Rectangular 3px Corner Radius
 export interface BadgeProps {
   children: React.ReactNode;
   variant?: 'default' | 'success' | 'warning' | 'info' | 'purple';
@@ -107,24 +107,24 @@ export function Badge({ children, variant = 'default', className = '' }: BadgePr
 
   return (
     <span
-      className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-mono font-semibold uppercase tracking-wider border ${style} ${className}`}
+      className={`inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-mono font-semibold uppercase tracking-wider border ${style} ${className}`}
     >
       {children}
     </span>
   );
 }
 
-// StatusPill
+// StatusPill - Rectangular container with circular status dot
 export function StatusPill({ status = 'Systems Online' }: { status?: string }) {
   return (
-    <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-medium">
+    <div className="flex items-center space-x-1.5 px-2.5 py-1 rounded-sm bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px] font-medium">
       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
       <span>{status}</span>
     </div>
   );
 }
 
-// TopHeader
+// TopHeader - Rectangular controls
 export interface TopHeaderProps {
   searchQuery: string;
   onSearchChange: (q: string) => void;
@@ -138,7 +138,7 @@ export function TopHeader({
   userRole = 'ORGANIZER',
 }: TopHeaderProps) {
   return (
-    <header className="bg-[#121215] border-b border-zinc-800/80 px-4 py-2.5 flex items-center justify-between gap-4 sticky top-0 z-20">
+    <header className="bg-[#0a0a0d] border-b border-zinc-800 px-4 py-2.5 flex items-center justify-between gap-4 sticky top-0 z-20">
       {/* Left Search Bar */}
       <div className="flex items-center space-x-2 flex-1 max-w-xs">
         <div className="relative w-full">
@@ -148,7 +148,7 @@ export function TopHeader({
             placeholder="Search events, communities..."
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-700"
+            className="w-full pl-8 pr-3 py-1.5 bg-[#111115] border border-zinc-800 rounded-sm text-xs text-white placeholder-zinc-500 focus:outline-none focus:border-zinc-700"
           />
         </div>
       </div>
@@ -158,14 +158,14 @@ export function TopHeader({
         <StatusPill status="Systems Online" />
 
         <button
-          className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800/60 transition"
+          className="p-1.5 text-zinc-400 hover:text-white rounded-sm hover:bg-zinc-800/60 transition"
           title="Notifications"
         >
           <Bell className="w-4 h-4" />
         </button>
 
         <button
-          className="p-1.5 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800/60 transition"
+          className="p-1.5 text-zinc-400 hover:text-white rounded-sm hover:bg-zinc-800/60 transition"
           title="Settings"
         >
           <Settings className="w-4 h-4" />
@@ -177,7 +177,7 @@ export function TopHeader({
   );
 }
 
-// PageHeader
+// PageHeader - Rectangular panel
 export interface PageHeaderProps {
   title: string;
   subtitle?: string;
@@ -186,7 +186,7 @@ export interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, action }: PageHeaderProps) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#121215] border border-zinc-800/80 p-4 rounded-xl">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-[#0a0a0d] border border-zinc-800 p-4 rounded">
       <div>
         <h1 className="text-lg font-bold text-white tracking-tight">{title}</h1>
         {subtitle && <p className="text-xs text-zinc-400 mt-0.5">{subtitle}</p>}
