@@ -8,6 +8,7 @@ import {
   AuditLogItem,
   RoleType,
 } from '@eventops/shared-types';
+import { Card, Button, Select, Badge, Input } from './DesignSystem';
 
 interface DashboardsTabProps {
   token: string | null;
@@ -167,55 +168,45 @@ export function DashboardsTab({ token, userOrgs, userEvents, roles }: Dashboards
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header and Sub-Tab Navigation */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60 p-4 border border-slate-800 rounded-2xl">
-        <div className="flex items-center space-x-3">
-          <div className="p-2.5 rounded-xl bg-violet-500/10 border border-violet-500/30 text-violet-400">
-            📊
+      <Card className="p-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center space-x-3">
+            <div className="p-2 rounded-lg bg-zinc-800 text-white font-bold">
+              📊
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-white tracking-tight">Metrics &amp; Reports</h2>
+              <p className="text-xs text-zinc-400">
+                Real-time organizer metrics, audience delivery analytics, and compliance audit logs.
+              </p>
+            </div>
           </div>
-          <div>
-            <h2 className="text-lg font-bold text-white tracking-tight">Analytics & Audit Hub</h2>
-            <p className="text-xs text-slate-400">
-              Real-time organizer metrics, audience delivery analytics, and immutable compliance audit logs.
-            </p>
-          </div>
-        </div>
 
-        {/* View Switcher Sub-Tabs */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800">
-          <button
-            onClick={() => setSubTab('organizer')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              subTab === 'organizer'
-                ? 'bg-emerald-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            📈 Organizer Analytics
-          </button>
-          <button
-            onClick={() => setSubTab('community')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              subTab === 'community'
-                ? 'bg-indigo-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            👥 Community & Outreach
-          </button>
-          <button
-            onClick={() => setSubTab('audit')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              subTab === 'audit'
-                ? 'bg-purple-600 text-white shadow'
-                : 'text-slate-400 hover:text-white'
-            }`}
-          >
-            📜 Audit Trail
-          </button>
+          {/* View Switcher Sub-Tabs */}
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant={subTab === 'organizer' ? 'primary' : 'outline'}
+              onClick={() => setSubTab('organizer')}
+            >
+              📈 Organizer Metrics
+            </Button>
+            <Button
+              variant={subTab === 'community' ? 'primary' : 'outline'}
+              onClick={() => setSubTab('community')}
+            >
+              👥 Community &amp; Outreach
+            </Button>
+            <Button
+              variant={subTab === 'audit' ? 'primary' : 'outline'}
+              onClick={() => setSubTab('audit')}
+            >
+              📜 Audit Trail
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
 
       {errorMsg && (
         <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex justify-between items-center">

@@ -10,6 +10,7 @@ import {
   Organization,
   Event as EventModel,
 } from '@eventops/shared-types';
+import { Card, Button, Select, Badge } from './DesignSystem';
 
 interface OrgWithCounts extends Organization {
   member_count: number;
@@ -374,46 +375,41 @@ export function CollaborationTab({
     : 0;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header & Controls */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+      <Card className="p-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-zinc-800/80">
           <div>
-            <h2 className="text-xl font-bold text-white tracking-tight flex items-center gap-2">
-              🤝 Collaboration Marketplace &amp; Workspaces
+            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              🤝 Speaker Proposals &amp; Workspaces
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Cross-community proposals, negotiation threads, and shared post-acceptance operations workspaces.
             </p>
           </div>
-          <button
-            onClick={() => setShowProposeModal(true)}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow-lg shadow-emerald-950 transition flex items-center gap-1.5 self-start md:self-auto"
-          >
-            <span>+</span> Propose Collaboration
-          </button>
+          <Button variant="primary" onClick={() => setShowProposeModal(true)}>
+            + Propose Collaboration
+          </Button>
         </div>
 
         {/* Filters */}
         <div className="flex flex-wrap items-center gap-3 pt-4">
-          <span className="text-xs font-medium text-slate-400">Filter by Status:</span>
-          <select
+          <span className="text-xs font-medium text-zinc-400">Filter by Status:</span>
+          <Select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500"
           >
             <option value="all">All Statuses</option>
             <option value={CollaborationStatus.PROPOSED}>Proposed</option>
             <option value={CollaborationStatus.COUNTERED}>Countered</option>
             <option value={CollaborationStatus.ACCEPTED}>Accepted</option>
             <option value={CollaborationStatus.REJECTED}>Rejected</option>
-          </select>
+          </Select>
 
-          <span className="text-xs font-medium text-slate-400 ml-2">Type:</span>
-          <select
+          <span className="text-xs font-medium text-zinc-400 ml-2">Type:</span>
+          <Select
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value)}
-            className="px-3 py-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white focus:outline-none focus:border-emerald-500"
           >
             <option value="all">All Types</option>
             <option value={CollaborationType.SPEAKER}>Speaker Exchange</option>
@@ -423,16 +419,13 @@ export function CollaborationTab({
             <option value={CollaborationType.OUTREACH}>Outreach Promotion</option>
             <option value={CollaborationType.MEDIA}>Media Partnership</option>
             <option value={CollaborationType.GENERAL}>General</option>
-          </select>
+          </Select>
 
-          <button
-            onClick={loadCollaborations}
-            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 ml-auto"
-          >
+          <Button variant="outline" onClick={loadCollaborations} className="ml-auto">
             Refresh
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Collaborations Grid / List */}
       {loading ? (

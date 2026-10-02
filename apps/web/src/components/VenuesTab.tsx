@@ -5,6 +5,7 @@ import {
   UserRole,
   VenueRequestStatus,
 } from '@eventops/shared-types';
+import { Card, Button, Select, Badge, Input } from './DesignSystem';
 
 interface VenueItem {
   id: string;
@@ -250,53 +251,40 @@ export function VenuesTab({ token, userOrgs, userEvents }: VenuesTabProps) {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-blue-950/60 to-slate-900 border border-blue-900/40 rounded-xl p-6 shadow-xl">
+      <Card className="p-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-              <span>🏛️</span> Venues Marketplace & Booking Requests
+            <h2 className="text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              <span>🏛️</span> Venues Marketplace &amp; Booking
             </h2>
-            <p className="text-sm text-slate-300 mt-1 max-w-2xl">
+            <p className="text-xs text-zinc-400 mt-1 max-w-2xl">
               Find event spaces, auditoriums, tech hubs, and conference venues. Filter by capacity,
               facilities, and city. Coordinate venue bookings and counter-proposals in real-time.
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowListModal(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg text-sm transition shadow-lg shadow-blue-950 flex items-center gap-1.5"
-            >
-              <span>+</span> List a Venue
-            </button>
-          </div>
+          <Button variant="primary" onClick={() => setShowListModal(true)}>
+            + List a Venue
+          </Button>
         </div>
 
         {/* View Toggle */}
-        <div className="flex items-center gap-2 mt-6 pt-4 border-t border-slate-800">
-          <button
+        <div className="flex items-center gap-2 mt-5 pt-3.5 border-t border-zinc-800/80">
+          <Button
+            variant={viewMode === 'directory' ? 'primary' : 'outline'}
             onClick={() => setViewMode('directory')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              viewMode === 'directory'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-white bg-slate-800'
-            }`}
           >
             Venues Directory ({venues.length})
-          </button>
-          <button
+          </Button>
+          <Button
+            variant={viewMode === 'inbox' ? 'primary' : 'outline'}
             onClick={() => setViewMode('inbox')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              viewMode === 'inbox'
-                ? 'bg-blue-600 text-white'
-                : 'text-slate-400 hover:text-white bg-slate-800'
-            }`}
           >
             Booking Requests Inbox ({bookingRequests.length})
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {errorMsg && (
         <div className="p-3 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-xs flex justify-between items-center">

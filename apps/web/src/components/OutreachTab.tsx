@@ -7,6 +7,7 @@ import {
   Organization,
   Event as EventModel,
 } from '@eventops/shared-types';
+import { Card, Button, Select, Badge, Input } from './DesignSystem';
 
 interface OrgWithCounts extends Organization {
   member_count: number;
@@ -260,61 +261,50 @@ export function OutreachTab({
   const reviewQueue = requests.filter((r) => r.status === OutreachStatus.PENDING || r.status === OutreachStatus.NEEDS_INFO);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Privacy Guarantee Header Card */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950/40 to-slate-900 border border-indigo-500/30 rounded-2xl p-6 shadow-xl space-y-3">
+      <Card className="p-5 space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 mb-2">
-              <span>🔒</span> Core Innovation: Permission-Based Outreach
-            </div>
-            <h2 className="text-xl font-bold text-white tracking-tight">
+            <Badge variant="purple" className="mb-2">
+              🔒 Permission-Based Outreach
+            </Badge>
+            <h2 className="text-lg font-bold text-white tracking-tight">
               Privacy-Preserving Audience Reach
             </h2>
-            <p className="text-xs text-slate-300 max-w-2xl mt-1 leading-relaxed">
-              External organizers <strong className="text-indigo-300">never see member emails or follower lists</strong>.
-              All outreach must be approved by target community admins. The platform delivers emails on the organizer's behalf and reports only aggregated metrics.
+            <p className="text-xs text-zinc-400 max-w-2xl mt-1 leading-relaxed">
+              External organizers <strong className="text-zinc-200">never see member emails or follower lists</strong>.
+              All outreach must be approved by target community admins. The platform delivers emails on the organizer's behalf and reports aggregated metrics.
             </p>
           </div>
 
-          <button
-            onClick={() => setShowNewModal(true)}
-            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-lg shadow-lg shadow-indigo-950 transition flex items-center gap-1.5 self-start md:self-auto"
-          >
-            <span>+</span> Submit Outreach Request
-          </button>
+          <Button variant="primary" onClick={() => setShowNewModal(true)}>
+            + Submit Outreach Request
+          </Button>
         </div>
 
         {/* Sub-Tabs: Campaigns vs Review Queue */}
-        <div className="flex items-center gap-3 pt-4 border-t border-slate-800">
-          <button
+        <div className="flex items-center gap-2 pt-3.5 border-t border-zinc-800/80">
+          <Button
+            variant={activeSubTab === 'campaigns' ? 'primary' : 'outline'}
             onClick={() => setActiveSubTab('campaigns')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
-              activeSubTab === 'campaigns'
-                ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
           >
             Outreach Requests &amp; Campaigns ({requests.length})
-          </button>
+          </Button>
 
-          <button
+          <Button
+            variant={activeSubTab === 'review_queue' ? 'primary' : 'outline'}
             onClick={() => setActiveSubTab('review_queue')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition flex items-center gap-2 ${
-              activeSubTab === 'review_queue'
-                ? 'bg-indigo-600/30 text-indigo-300 border border-indigo-500/40'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
           >
             Community Admin Review Queue
             {reviewQueue.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
-                {reviewQueue.length} pending
+              <span className="ml-1.5 px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">
+                {reviewQueue.length}
               </span>
             )}
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* SUB-TAB 1: REQUESTS & CAMPAIGNS */}
       {activeSubTab === 'campaigns' && (

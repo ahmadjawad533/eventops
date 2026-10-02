@@ -12,6 +12,7 @@ import {
   Event as EventModel,
   CertificateVerification,
 } from '@eventops/shared-types';
+import { TopHeader, Card, Button, Badge } from './components/DesignSystem';
 import {
   Calendar,
   Users,
@@ -896,7 +897,14 @@ export function App() {
               </aside>
 
               {/* Main Content Area */}
-              <div className="flex-1 bg-[#09090b] p-5 space-y-5 overflow-y-auto min-w-0">
+              <div className="flex-1 bg-[#09090b] flex flex-col min-w-0 overflow-y-auto">
+                <TopHeader
+                  searchQuery={searchEventQuery}
+                  onSearchChange={setSearchEventQuery}
+                  userRole="ORGANIZER"
+                />
+
+                <div className="p-5 space-y-5 flex-1">
                 {eventActionMsg && (
                   <div className="p-3 bg-[#121215] border border-emerald-500/40 rounded-xl text-emerald-400 text-xs flex justify-between items-center shadow">
                     <div className="flex items-center space-x-2">
@@ -1376,7 +1384,8 @@ export function App() {
               )}
             </div>
           </div>
-        )}
+        </div>
+      )}
 
       {/* MODAL 1: TICKET DISPLAY WITH SIGNED QR CODE */}
       {activeTicket && (
