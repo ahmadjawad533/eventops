@@ -47,6 +47,10 @@ import {
   Crown,
   ShieldAlert,
   SlidersHorizontal,
+  Bell,
+  Settings,
+  Maximize2,
+  MoreVertical,
 } from 'lucide-react';
 import { CollaborationTab } from './components/CollaborationTab';
 import { OutreachTab } from './components/OutreachTab';
@@ -689,104 +693,85 @@ export function App() {
   });
 
   const navigationItems = [
-    { id: 'events', label: 'Events & Discovery', icon: Calendar, badge: events.length },
-    { id: 'organizations', label: 'Communities & Hubs', icon: Users, badge: orgs.length },
-    { id: 'collaborations', label: 'Co-Host & Workspace', icon: Handshake },
-    { id: 'outreach', label: 'Audience Outreach', icon: Send },
-    { id: 'sponsorships', label: 'Sponsorships CRM', icon: Briefcase },
-    { id: 'venues', label: 'Venues & Bookings', icon: Building2 },
-    { id: 'dashboards', label: 'Analytics & Audit', icon: BarChart3 },
-    { id: 'certificates', label: 'Verify Certificate', icon: ShieldCheck },
+    { id: 'events', label: 'Events & VIP Tickets', icon: Calendar, badge: events.length },
+    { id: 'organizations', label: 'Communities & Chapters', icon: Users, badge: orgs.length },
+    { id: 'collaborations', label: 'Speaker Proposals', icon: Handshake },
+    { id: 'outreach', label: 'Broadcasting', icon: Send },
+    { id: 'sponsorships', label: 'Sponsorship CRM', icon: Briefcase },
+    { id: 'venues', label: 'Venues & Site', icon: MapPin },
+    { id: 'dashboards', label: 'Metrics & Reports', icon: BarChart3 },
+    { id: 'certificates', label: 'Certificate Portal', icon: ShieldCheck },
     { id: 'profile', label: 'Profile & Roles', icon: GraduationCap },
   ];
 
   return (
-    <div className="min-h-screen bg-[#120e0c] text-amber-50 flex flex-col font-sans selection:bg-amber-600 selection:text-amber-950 relative overflow-x-hidden">
-      {/* Dynamic Ambient Blur Lights */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] glow-orb-emerald rounded-full animate-pulse-slow" />
-        <div className="absolute top-1/3 -right-40 w-[500px] h-[500px] glow-orb-purple rounded-full animate-pulse-slow" />
-        <div className="absolute -bottom-40 left-1/3 w-[600px] h-[600px] glow-orb-blue rounded-full animate-pulse-slow" />
-      </div>
+    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans relative overflow-x-hidden selection:bg-zinc-800 selection:text-white">
+      {/* Sleek Matte Top Bar */}
+      <header className="sticky top-0 z-40 bg-[#121215] border-b border-zinc-800/80 px-4 md:px-6 py-3 flex items-center justify-between shadow-lg">
+        <div className="flex items-center space-x-4 flex-1">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="lg:hidden p-2 text-zinc-400 hover:text-white rounded-xl bg-zinc-900 border border-zinc-800"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
 
-      {/* Vintage Editorial Gazette Header */}
-      <header className="sticky top-0 z-40 glass-panel-deep px-4 md:px-8 py-3.5 shadow-2xl vintage-header-border">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-amber-300 hover:text-amber-100 rounded-xl bg-amber-950/80 border border-amber-500/30"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
+          {/* Top Wide Search Input */}
+          <div className="relative hidden sm:block w-72 md:w-96">
+            <Search className="w-4 h-4 absolute left-3 top-2.5 text-zinc-400" />
+            <input
+              type="text"
+              value={searchEventQuery}
+              onChange={(e) => setSearchEventQuery(e.target.value)}
+              placeholder="Search events, communities, venues..."
+              className="w-full bg-[#18181c] border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 rounded-xl pl-9 pr-12 py-2 focus:outline-none focus:border-zinc-600 transition"
+            />
+            <span className="text-[10px] font-mono text-zinc-500 bg-zinc-800/80 border border-zinc-700/50 px-1.5 py-0.5 rounded absolute right-2.5 top-2">
+              ⌘K
+            </span>
+          </div>
+        </div>
 
-            <div
-              className="flex items-center space-x-3 cursor-pointer group"
-              onClick={() => setActiveTab('events')}
-            >
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 via-amber-700 to-amber-900 p-0.5 shadow-lg shadow-amber-900/40 group-hover:scale-105 transition-all">
-                <div className="w-full h-full bg-[#181310] rounded-[14px] flex items-center justify-center border border-amber-500/40">
-                  <Flame className="w-5 h-5 text-amber-400" />
-                </div>
+        {/* Right Action Icons & Status */}
+        <div className="flex items-center space-x-3">
+          {health && (
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-xs font-medium">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span>Systems Online</span>
+            </div>
+          )}
+
+          <button
+            className="p-2 rounded-xl bg-[#18181c] border border-zinc-800 text-zinc-400 hover:text-white transition relative"
+            title="Notifications"
+          >
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
+          </button>
+
+          <button
+            className="p-2 rounded-xl bg-[#18181c] border border-zinc-800 text-zinc-400 hover:text-white transition"
+            title="Settings"
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+
+          {user && (
+            <div className="flex items-center space-x-2 pl-3 border-l border-zinc-800">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-900 border border-zinc-700 flex items-center justify-center text-xs font-bold text-white shadow">
+                {user.name.slice(0, 2).toUpperCase()}
               </div>
-              <div>
-                <div className="flex items-center space-x-2">
-                  <h1 className="text-2xl font-black tracking-tight text-amber-100 font-cinzel gradient-text-neon">
-                    EventOps
-                  </h1>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/40 vintage-stamp">
-                    EST. 2026
-                  </span>
+              <div className="hidden md:block text-left">
+                <div className="text-xs font-semibold text-zinc-200">{user.name}</div>
+                <div className="text-[10px] text-emerald-400 font-mono font-bold uppercase tracking-wider">
+                  {roles[0]?.role_type || RoleType.ORGANIZER}
                 </div>
-                <p className="text-[11px] text-amber-400/80 font-serif-vintage italic hidden sm:block">
-                  The Official Gazette &amp; Guild Dispatch Portal
-                </p>
               </div>
             </div>
-          </div>
-
-          <div className="flex items-center space-x-4">
-            {health && (
-              <span className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-mono bg-amber-950/80 text-amber-300 border border-amber-500/40 shadow-inner">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
-                </span>
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                Guild Dispatch Online
-              </span>
-            )}
-
-            {user ? (
-              <div className="flex items-center space-x-3">
-                <div className="hidden md:block text-right">
-                  <div className="text-xs font-bold text-amber-100 flex items-center gap-1.5 justify-end font-cinzel">
-                    {user.name}
-                    {isPlatformAdmin && (
-                      <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md">
-                        Grandmaster
-                      </span>
-                    )}
-                  </div>
-                  <div className="text-[11px] text-amber-400/70 font-mono">{user.email}</div>
-                </div>
-
-                <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-800 p-0.5 flex items-center justify-center font-bold text-amber-950 text-xs shadow-xl">
-                  <div className="w-full h-full bg-[#181310] rounded-[14px] flex items-center justify-center text-amber-200 font-cinzel">
-                    {user.name.slice(0, 2).toUpperCase()}
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleLogout}
-                  className="p-2 text-amber-400/70 hover:text-rose-400 hover:bg-rose-950/40 rounded-xl transition border border-transparent hover:border-rose-500/30"
-                  title="Sign Out"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </div>
-            ) : null}
-          </div>
+          )}
         </div>
       </header>
 
@@ -982,18 +967,38 @@ export function App() {
         ) : (
           /* Logged In Dashboard Layout */
           <>
-            {/* Glass Sidebar Navigation */}
+            {/* Sleek Matte Sidebar Navigation */}
             <aside
-              className={`fixed inset-y-0 left-0 z-30 w-64 glass-panel-deep border-r border-white/10 p-4 transform transition-transform duration-300 lg:relative lg:translate-x-0 rounded-3xl shrink-0 ${
+              className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#141417] border-r border-zinc-800/80 p-4 transform transition-transform duration-300 lg:relative lg:translate-x-0 rounded-2xl shrink-0 flex flex-col justify-between ${
                 mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
               }`}
             >
               <div className="space-y-6">
-                <div>
-                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 px-3 mb-2">
-                    Platform Navigation
+                {/* Brand Header */}
+                <div className="flex items-center justify-between px-2 pt-1">
+                  <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('events')}>
+                    <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-white font-bold shadow-md">
+                      <Zap className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <div>
+                      <h1 className="text-lg font-extrabold text-white tracking-tight">EventOps</h1>
+                      <div className="text-[10px] text-zinc-400 font-mono">v2.4 Production</div>
+                    </div>
                   </div>
-                  <nav className="space-y-1.5">
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="lg:hidden text-zinc-400 hover:text-white"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                {/* Nav Links */}
+                <div>
+                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 px-3 mb-2">
+                    Navigation
+                  </div>
+                  <nav className="space-y-1">
                     {navigationItems.map((item) => {
                       const Icon = item.icon;
                       const isActive = activeTab === item.id;
@@ -1004,18 +1009,22 @@ export function App() {
                             setActiveTab(item.id as any);
                             setMobileMenuOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-xs font-bold transition ${
+                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${
                             isActive
-                              ? 'bg-gradient-to-r from-emerald-500/20 via-teal-500/10 to-indigo-500/10 text-emerald-300 border border-emerald-500/40 shadow-lg shadow-emerald-950/30'
-                              : 'text-slate-400 hover:text-white hover:bg-white/5'
+                              ? 'bg-white text-black shadow-md'
+                              : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                           }`}
                         >
                           <div className="flex items-center space-x-3">
-                            <Icon className={`w-4 h-4 ${isActive ? 'text-emerald-400' : 'text-slate-400'}`} />
+                            <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-zinc-400'}`} />
                             <span>{item.label}</span>
                           </div>
                           {item.badge !== undefined && (
-                            <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-950/80 border border-slate-800 text-emerald-400">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                                isActive ? 'bg-zinc-200 text-black' : 'bg-zinc-800 text-zinc-300'
+                              }`}
+                            >
                               {item.badge}
                             </span>
                           )}
@@ -1024,40 +1033,42 @@ export function App() {
                     })}
                   </nav>
                 </div>
-
-                {/* Quick Launchpad */}
-                <div className="p-4 bg-slate-950/70 border border-white/10 rounded-2xl space-y-2.5">
-                  <div className="text-xs font-bold text-white flex items-center justify-between">
-                    <span>Quick Launchpad</span>
-                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  </div>
-                  <button
-                    onClick={() => setShowCreateEventModal(true)}
-                    className="w-full py-2.5 px-3 bg-emerald-500/15 hover:bg-emerald-500/25 text-emerald-300 text-xs font-bold rounded-xl transition border border-emerald-500/30 flex items-center justify-center space-x-2"
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Host New Event</span>
-                  </button>
-                  <button
-                    onClick={() => setShowCreateOrgModal(true)}
-                    className="w-full py-2.5 px-3 bg-slate-900/90 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-xl transition border border-white/10 flex items-center justify-center space-x-2"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    <span>Register Org / Chapter</span>
-                  </button>
-                </div>
               </div>
+
+              {/* Sidebar User Profile Card & Quick Actions */}
+              {user && (
+                <div className="pt-4 border-t border-zinc-800/80">
+                  <div className="bg-[#18181c] border border-zinc-800/80 rounded-xl p-3 flex items-center justify-between">
+                    <div className="flex items-center space-x-3 truncate">
+                      <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-xs text-white shrink-0">
+                        {user.name.slice(0, 2).toUpperCase()}
+                      </div>
+                      <div className="truncate text-left">
+                        <div className="text-xs font-semibold text-white truncate">{user.name}</div>
+                        <div className="text-[10px] text-zinc-400 truncate">{user.email}</div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="p-1.5 text-zinc-400 hover:text-rose-400 rounded-lg hover:bg-zinc-800 transition shrink-0"
+                      title="Sign Out"
+                    >
+                      <LogOut className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </aside>
 
             {/* Main Content Area */}
             <div className="flex-1 space-y-6 min-w-0">
               {eventActionMsg && (
-                <div className="p-4 glass-panel-deep border border-emerald-500/40 rounded-2xl text-emerald-400 text-xs flex justify-between items-center shadow-xl">
+                <div className="p-4 bg-[#141417] border border-emerald-500/40 rounded-2xl text-emerald-400 text-xs flex justify-between items-center shadow-xl">
                   <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
                     <span>{eventActionMsg}</span>
                   </div>
-                  <button onClick={() => setEventActionMsg(null)} className="text-slate-400 hover:text-white">
+                  <button onClick={() => setEventActionMsg(null)} className="text-zinc-400 hover:text-white">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -1066,26 +1077,40 @@ export function App() {
               {/* TAB 1: EVENTS DISCOVERY & MANAGEMENT */}
               {activeTab === 'events' && (
                 <div className="space-y-6">
-                  {/* Hero Banner */}
-                  <div className="relative glass-panel-deep border border-white/10 rounded-3xl p-8 overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-emerald-500/15 via-teal-500/15 to-purple-500/15 rounded-full blur-3xl pointer-events-none" />
-                    <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                      <div className="space-y-3">
-                        <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                          <Flame className="w-4 h-4 text-emerald-400" />
-                          <span>Luma &amp; Partiful Inspired Event Hub</span>
-                        </div>
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">
-                          Discover Tech Summits &amp; Meetups
-                        </h2>
-                        <p className="text-xs text-slate-400 max-w-xl leading-relaxed">
-                          RSVP for upcoming offline &amp; virtual gatherings, receive HMAC-signed VIP ticket passes, and earn verified attendance credentials.
-                        </p>
-                      </div>
+                  {/* Top Bar Header & Action Controls matching Screenshot */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800/60">
+                    <div>
+                      <h1 className="text-2xl font-bold text-white tracking-tight">Events &amp; VIP Tickets</h1>
+                      <p className="text-xs text-zinc-400 mt-0.5">
+                        Manage RSVPs, ticket verification &amp; attendee check-ins
+                      </p>
+                    </div>
+
+                    {/* Filter Pills & Actions */}
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button className="px-3.5 py-1.5 bg-white text-black font-semibold rounded-xl text-xs shadow">
+                        All
+                      </button>
+                      <button className="px-3.5 py-1.5 bg-[#18181c] text-zinc-400 hover:text-white border border-zinc-800 rounded-xl text-xs transition">
+                        Tech
+                      </button>
+                      <button className="px-3.5 py-1.5 bg-[#18181c] text-zinc-400 hover:text-white border border-zinc-800 rounded-xl text-xs transition">
+                        Workshop
+                      </button>
+                      <button className="px-3.5 py-1.5 bg-[#18181c] text-zinc-400 hover:text-white border border-zinc-800 rounded-xl text-xs transition">
+                        Hackathon
+                      </button>
+
+                      <button
+                        className="p-2 bg-[#18181c] border border-zinc-800 text-zinc-400 hover:text-white rounded-xl transition"
+                        title="Advanced Filters"
+                      >
+                        <SlidersHorizontal className="w-4 h-4" />
+                      </button>
 
                       <button
                         onClick={() => setShowCreateEventModal(true)}
-                        className="px-5 py-3 glass-button-primary text-white font-bold text-xs rounded-2xl transition flex items-center space-x-2 shrink-0"
+                        className="px-4 py-2 bg-white text-black font-semibold text-xs rounded-xl hover:bg-zinc-200 transition flex items-center gap-1.5 shadow"
                       >
                         <Plus className="w-4 h-4" />
                         <span>Create Event</span>
@@ -1093,164 +1118,172 @@ export function App() {
                     </div>
                   </div>
 
-                  {/* Filter & Search Controls */}
-                  <div className="glass-panel-deep p-4 border border-white/10 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
-                    <div className="relative w-full md:w-80">
-                      <Search className="w-4 h-4 absolute left-3.5 top-3 text-slate-400" />
-                      <input
-                        type="text"
-                        value={searchEventQuery}
-                        onChange={(e) => setSearchEventQuery(e.target.value)}
-                        placeholder="Search event title, location..."
-                        className="w-full pl-10 pr-4 py-2.5 glass-input-glow rounded-xl text-xs"
-                      />
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                      <div className="flex items-center space-x-2">
-                        <Filter className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-xs text-slate-400">Category:</span>
-                        <select
-                          value={eventCategoryFilter}
-                          onChange={(e) => setEventCategoryFilter(e.target.value)}
-                          className="px-3 py-1.5 glass-input-glow rounded-xl text-xs"
+                  {/* 3-Column Event Grid matching Screenshot */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    {filteredEvents.map((ev) => {
+                      const startDate = new Date(ev.start_date);
+                      const isPublished = ev.status === EventStatus.PUBLISHED;
+                      return (
+                        <div
+                          key={ev.id}
+                          className="bg-[#141417] border border-zinc-800/80 rounded-2xl overflow-hidden hover:border-zinc-700 transition flex flex-col justify-between group shadow-lg"
                         >
-                          <option value="all">All Categories</option>
-                          <option value={EventCategory.TECH}>Tech</option>
-                          <option value={EventCategory.DESIGN}>Design</option>
-                          <option value={EventCategory.BUSINESS}>Business</option>
-                          <option value={EventCategory.SCIENCE}>Science</option>
-                          <option value={EventCategory.SOCIAL}>Social</option>
-                        </select>
-                      </div>
+                          {/* Card Banner Container */}
+                          <div className="h-40 w-full relative overflow-hidden bg-gradient-to-br from-zinc-800 via-zinc-900 to-black border-b border-zinc-800/80 flex items-center justify-center">
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#141417] via-transparent to-transparent z-10" />
+                            <Calendar className="w-12 h-12 text-zinc-700 opacity-40 group-hover:scale-110 transition duration-300" />
 
-                      <div className="flex items-center space-x-2">
-                        <span className="text-xs text-slate-400">Format:</span>
-                        <select
-                          value={eventFormatFilter}
-                          onChange={(e) => setEventFormatFilter(e.target.value)}
-                          className="px-3 py-1.5 glass-input-glow rounded-xl text-xs"
-                        >
-                          <option value="all">All Formats</option>
-                          <option value={EventFormat.OFFLINE}>Offline</option>
-                          <option value={EventFormat.ONLINE}>Online</option>
-                        </select>
+                            {/* Format Pill Overlay */}
+                            <div className="absolute top-3 left-3 z-20">
+                              <span className="bg-black/60 backdrop-blur-md text-zinc-200 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-white/10">
+                                {ev.format}
+                              </span>
+                            </div>
+
+                            {/* Status Pill Overlay */}
+                            <div className="absolute top-3 right-3 z-20">
+                              <span
+                                className={`text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full border ${
+                                  isPublished
+                                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                                    : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
+                                }`}
+                              >
+                                {ev.status}
+                              </span>
+                            </div>
+                          </div>
+
+                          {/* Card Content Body */}
+                          <div className="p-4 space-y-3">
+                            <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                              <span className="text-emerald-400 font-semibold uppercase tracking-wider text-[10px]">
+                                {ev.category}
+                              </span>
+                              <div className="flex items-center space-x-1 text-zinc-400">
+                                <Clock className="w-3.5 h-3.5 text-zinc-500" />
+                                <span>
+                                  {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div>
+                              <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition line-clamp-1">
+                                {ev.title}
+                              </h3>
+                              <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
+                                {ev.description}
+                              </p>
+                            </div>
+
+                            <div className="flex items-center space-x-1.5 text-xs text-zinc-400 pt-1">
+                              <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
+                              <span className="truncate">{ev.location || 'San Francisco, CA • Moscone Center'}</span>
+                            </div>
+
+                            {/* Seats Capacity Bar */}
+                            <div className="space-y-1 pt-2">
+                              <div className="flex justify-between text-[11px] text-zinc-400">
+                                <span>Seats Reserved</span>
+                                <span className="font-mono text-zinc-200 font-semibold">
+                                  {ev.registered_count} / {ev.capacity}
+                                </span>
+                              </div>
+                              <div className="w-full bg-zinc-800/80 h-1.5 rounded-full overflow-hidden">
+                                <div
+                                  className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
+                                  style={{
+                                    width: `${Math.min(100, (ev.registered_count / ev.capacity) * 100)}%`,
+                                  }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Card Actions Footer */}
+                          <div className="p-4 pt-0 flex items-center gap-2">
+                            {isPublished ? (
+                              <button
+                                onClick={() => handleRegisterEvent(ev.id)}
+                                className="flex-1 py-2 bg-white text-black font-semibold text-xs rounded-xl hover:bg-zinc-200 transition flex items-center justify-center gap-1.5 shadow"
+                              >
+                                <Ticket className="w-3.5 h-3.5" />
+                                <span>RSVP Now</span>
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handlePublishEvent(ev.id)}
+                                className="flex-1 py-2 bg-emerald-500/20 text-emerald-300 font-semibold text-xs rounded-xl hover:bg-emerald-500/30 border border-emerald-500/30 transition flex items-center justify-center gap-1.5"
+                              >
+                                <Sparkles className="w-3.5 h-3.5" />
+                                <span>Publish</span>
+                              </button>
+                            )}
+
+                            <button
+                              onClick={() => {
+                                setCheckInEventId(ev.id);
+                                setShowCheckInModal(true);
+                              }}
+                              className="p-2 bg-[#242429] text-zinc-300 hover:text-white rounded-xl border border-zinc-700/60 transition"
+                              title="Check-In Entrance Scanner"
+                            >
+                              <CheckCircle2 className="w-4 h-4" />
+                            </button>
+
+                            <button
+                              className="p-2 bg-[#242429] text-zinc-300 hover:text-white rounded-xl border border-zinc-700/60 transition"
+                              title="Full Event Details"
+                            >
+                              <Maximize2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Host Your Own Event Card matching Screenshot */}
+                    <div
+                      onClick={() => setShowCreateEventModal(true)}
+                      className="bg-[#141417] border border-dashed border-zinc-800 hover:border-zinc-600 transition rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer min-h-[320px] group shadow-lg"
+                    >
+                      <div className="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-700/80 group-hover:bg-white group-hover:text-black text-zinc-300 transition flex items-center justify-center mb-3 shadow">
+                        <Plus className="w-6 h-6" />
                       </div>
+                      <h3 className="text-sm font-bold text-white group-hover:text-emerald-400 transition">
+                        Host Your Own Event
+                      </h3>
+                      <p className="text-xs text-zinc-400 mt-1 max-w-[200px] leading-relaxed">
+                        Create a new event, manage RSVPs &amp; issue HMAC VIP tickets
+                      </p>
                     </div>
                   </div>
 
-                  {/* Glass Event Cards Grid */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {filteredEvents.length === 0 ? (
-                      <div className="col-span-full py-20 text-center glass-panel-deep rounded-3xl border border-white/10 text-slate-500 text-xs">
-                        No events found matching search filters.
-                      </div>
-                    ) : (
-                      filteredEvents.map((ev) => {
-                        const startDate = new Date(ev.start_date);
-                        const isPublished = ev.status === EventStatus.PUBLISHED;
-                        return (
-                          <div
-                            key={ev.id}
-                            className="glass-card-neon rounded-3xl p-6 flex flex-col justify-between relative overflow-hidden group"
-                          >
-                            <div className="space-y-4">
-                              <div className="flex items-start justify-between gap-3">
-                                <div className="flex items-center space-x-2">
-                                  <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/15 text-emerald-300 border border-emerald-500/30">
-                                    {ev.category}
-                                  </span>
-                                  <span className="px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
-                                    {ev.format}
-                                  </span>
-                                </div>
-                                <span
-                                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase border ${
-                                    isPublished
-                                      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                                      : 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                                  }`}
-                                >
-                                  {ev.status}
-                                </span>
-                              </div>
-
-                              <div>
-                                <h3 className="text-lg font-extrabold text-white group-hover:text-emerald-300 transition line-clamp-1">
-                                  {ev.title}
-                                </h3>
-                                <p className="text-xs text-slate-400 mt-1 line-clamp-2 leading-relaxed">
-                                  {ev.description}
-                                </p>
-                              </div>
-
-                              <div className="space-y-2 text-xs text-slate-400 pt-1">
-                                <div className="flex items-center space-x-2">
-                                  <Clock className="w-4 h-4 text-emerald-400 shrink-0" />
-                                  <span>
-                                    {startDate.toLocaleDateString()} at{' '}
-                                    {startDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                  </span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <MapPin className="w-4 h-4 text-indigo-400 shrink-0" />
-                                  <span className="truncate">{ev.location || 'Virtual Platform'}</span>
-                                </div>
-                              </div>
-
-                              {/* Capacity Bar */}
-                              <div className="space-y-1.5 pt-2">
-                                <div className="flex justify-between text-[11px] text-slate-400">
-                                  <span>Seats Reserved</span>
-                                  <span className="font-mono text-emerald-400 font-bold">
-                                    {ev.registered_count} / {ev.capacity}
-                                  </span>
-                                </div>
-                                <div className="w-full bg-slate-950 h-2.5 rounded-full overflow-hidden border border-white/10 p-0.5">
-                                  <div
-                                    className="bg-gradient-to-r from-emerald-400 to-indigo-500 h-full rounded-full transition-all duration-500"
-                                    style={{
-                                      width: `${Math.min(100, (ev.registered_count / ev.capacity) * 100)}%`,
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-
-                            <div className="pt-5 mt-5 border-t border-white/10 flex items-center gap-2">
-                              {isPublished ? (
-                                <button
-                                  onClick={() => handleRegisterEvent(ev.id)}
-                                  className="flex-1 py-2.5 px-3 glass-button-primary text-white font-bold text-xs rounded-xl shadow-lg flex items-center justify-center space-x-2"
-                                >
-                                  <Ticket className="w-4 h-4" />
-                                  <span>RSVP Now</span>
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handlePublishEvent(ev.id)}
-                                  className="flex-1 py-2.5 px-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold text-xs rounded-xl transition border border-amber-500/30 flex items-center justify-center space-x-2"
-                                >
-                                  <Sparkles className="w-4 h-4" />
-                                  <span>Publish Event</span>
-                                </button>
-                              )}
-
-                              <button
-                                onClick={() => {
-                                  setCheckInEventId(ev.id);
-                                  setShowCheckInModal(true);
-                                }}
-                                className="px-3.5 py-2.5 glass-button-secondary text-slate-300 text-xs font-bold rounded-xl"
-                                title="Organizer Entrance Scanner"
-                              >
-                                Check-In
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })
-                    )}
+                  {/* Persona Switcher Bar at Bottom */}
+                  <div className="mt-8 p-4 bg-[#141417] border border-zinc-800/80 rounded-2xl space-y-3 shadow-lg">
+                    <div className="flex items-center justify-between text-xs font-semibold text-zinc-300">
+                      <span className="flex items-center gap-1.5">
+                        <Zap className="w-4 h-4 text-emerald-400" />
+                        1-Click Persona Switcher
+                      </span>
+                      <span className="text-[10px] text-emerald-400 font-mono">5 Active Roles</span>
+                    </div>
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+                      {DEMO_ACCOUNTS.map((demo) => (
+                        <button
+                          key={demo.email}
+                          type="button"
+                          onClick={() => handleQuickDemoSignIn(demo)}
+                          className="p-2.5 bg-[#18181c] hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-left transition flex flex-col justify-between group"
+                        >
+                          <span className="text-xs font-bold text-zinc-200 group-hover:text-emerald-400 transition">
+                            {demo.label}
+                          </span>
+                          <span className="text-[10px] text-zinc-400 truncate mt-0.5">{demo.desc}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}

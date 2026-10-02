@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800;900&family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,400&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,183 +8,83 @@
   body {
     margin: 0;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #120e0c;
-    color: #f5f0e6;
+    background-color: #09090b;
+    color: #f4f4f5;
     overflow-x: hidden;
-    background-image: 
-      radial-gradient(rgba(217, 119, 6, 0.04) 1px, transparent 0),
-      radial-gradient(rgba(180, 83, 9, 0.03) 1px, transparent 0);
-    background-size: 32px 32px;
-    background-position: 0 0, 16px 16px;
-  }
-
-  h1, h2, h3, .font-serif-vintage {
-    font-family: 'Playfair Display', Georgia, serif;
-  }
-
-  .font-cinzel {
-    font-family: 'Cinzel', serif;
   }
 }
 
-/* Authentic Vintage Design System & Architectural Gazette Layouts */
+/* Sleek Matte Dark Obsidian Design System (Exact Match) */
 .glass-panel-deep {
-  background: linear-gradient(145deg, rgba(32, 25, 21, 0.94) 0%, rgba(20, 16, 13, 0.96) 100%);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  border: 2px solid rgba(217, 119, 6, 0.35);
-  box-shadow: 
-    0 25px 60px rgba(0, 0, 0, 0.95), 
-    inset 0 1px 0 rgba(254, 243, 199, 0.12),
-    0 0 0 4px rgba(28, 22, 18, 0.8);
+  background: #121215;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
 }
 
 .glass-card-neon {
-  background: linear-gradient(135deg, rgba(46, 36, 29, 0.85) 0%, rgba(28, 22, 18, 0.9) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(217, 119, 6, 0.28);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(254, 243, 199, 0.05);
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  position: relative;
+  background: #141417;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card-neon:hover {
-  background: linear-gradient(135deg, rgba(58, 46, 38, 0.95) 0%, rgba(36, 28, 23, 0.98) 100%);
-  border-color: rgba(245, 158, 11, 0.65);
-  transform: translateY(-4px) scale(1.005);
-  box-shadow: 
-    0 20px 45px -10px rgba(217, 119, 6, 0.4),
-    0 0 25px rgba(245, 158, 11, 0.2);
+  background: #18181c;
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9);
 }
 
 .glass-input-glow {
-  background: #0e0b09;
-  border: 1.5px solid rgba(217, 119, 6, 0.35);
-  color: #fef3c7;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  transition: all 0.25s ease;
+  background: #141417;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  transition: all 0.2s ease;
 }
 
 .glass-input-glow:focus {
-  background: #080605;
-  border-color: #f59e0b;
-  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  background: #18181c;
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
   outline: none;
 }
 
-/* Vintage Embossed Leather & Gold Buttons */
 .glass-button-primary {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 45%, #78350f 100%);
-  color: #fef3c7 !important;
-  font-family: 'Cinzel', serif;
-  letter-spacing: 0.05em;
+  background: #ffffff;
+  color: #000000 !important;
   font-weight: 700;
-  border: 1.5px solid #f59e0b;
-  box-shadow: 
-    0 10px 30px -5px rgba(217, 119, 6, 0.5),
-    inset 0 1px 0 rgba(254, 243, 199, 0.3);
-  transition: all 0.25s ease;
+  border: 1px solid #ffffff;
+  transition: all 0.2s ease;
 }
 
 .glass-button-primary:hover {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 45%, #92400e 100%);
-  transform: translateY(-1.5px);
-  box-shadow: 
-    0 15px 35px -5px rgba(245, 158, 11, 0.7),
-    0 0 20px rgba(245, 158, 11, 0.4);
+  background: #e4e4e7;
+  transform: translateY(-1px);
 }
 
 .glass-button-secondary {
-  background: rgba(217, 119, 6, 0.14);
-  backdrop-filter: blur(12px);
-  border: 1.5px solid rgba(217, 119, 6, 0.35);
-  color: #fde68a;
-  font-family: 'Cinzel', serif;
+  background: #242429;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
   transition: all 0.2s ease;
 }
 
 .glass-button-secondary:hover {
-  background: rgba(217, 119, 6, 0.28);
-  border-color: rgba(245, 158, 11, 0.7);
-  color: #fff;
-}
-
-/* Vintage Perforated Ticket Stub Border */
-.vintage-ticket-stub {
-  background: linear-gradient(135deg, #261d17 0%, #1a130f 100%);
-  border: 2px dashed rgba(217, 119, 6, 0.4);
-  position: relative;
-}
-
-/* Vintage Wax Seal & Official Stamp Badges */
-.vintage-stamp {
-  font-family: 'Cinzel', serif;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  border: 2px solid currentColor;
-  padding: 2px 8px;
-  border-radius: 4px;
-  transform: rotate(-2deg);
-  display: inline-block;
-}
-
-.vintage-header-border {
-  border-top: 3px double rgba(217, 119, 6, 0.5);
-  border-bottom: 3px double rgba(217, 119, 6, 0.5);
-}
-
-/* Gradients */
-.gradient-text-neon {
-  background: linear-gradient(135deg, #fef08a 0%, #f59e0b 45%, #d97706 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.gradient-text-gold {
-  background: linear-gradient(135deg, #f97316 0%, #ea580c 50%, #b45309 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.glow-orb-emerald {
-  filter: blur(130px);
-  background: radial-gradient(circle, rgba(217, 119, 6, 0.22) 0%, rgba(0, 0, 0, 0) 70%);
-}
-
-.glow-orb-purple {
-  filter: blur(130px);
-  background: radial-gradient(circle, rgba(180, 83, 9, 0.2) 0%, rgba(0, 0, 0, 0) 70%);
-}
-
-.glow-orb-blue {
-  filter: blur(130px);
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.18) 0%, rgba(0, 0, 0, 0) 70%);
-}
-
-/* Animations */
-@keyframes floatSlow {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-12px) rotate(1.5deg); }
-}
-
-.animate-float {
-  animation: floatSlow 6s ease-in-out infinite;
+  background: #2f2f36;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Scrollbar */
 ::-webkit-scrollbar {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #120e0c;
+  background: #09090b;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(217, 119, 6, 0.4);
+  background: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
-  border: 1px solid rgba(254, 243, 199, 0.1);
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.8);
+  background: rgba(255, 255, 255, 0.4);
 }
