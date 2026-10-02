@@ -701,7 +701,7 @@ export function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-slate-950 relative overflow-x-hidden">
+    <div className="min-h-screen bg-[#120e0c] text-amber-50 flex flex-col font-sans selection:bg-amber-600 selection:text-amber-950 relative overflow-x-hidden">
       {/* Dynamic Ambient Blur Lights */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-0 left-1/4 w-[600px] h-[600px] glow-orb-emerald rounded-full animate-pulse-slow" />
@@ -709,13 +709,13 @@ export function App() {
         <div className="absolute -bottom-40 left-1/3 w-[600px] h-[600px] glow-orb-blue rounded-full animate-pulse-slow" />
       </div>
 
-      {/* Top Glass Header */}
-      <header className="sticky top-0 z-40 glass-panel-deep px-4 md:px-8 py-3.5 shadow-2xl">
+      {/* Vintage Editorial Gazette Header */}
+      <header className="sticky top-0 z-40 glass-panel-deep px-4 md:px-8 py-3.5 shadow-2xl vintage-header-border">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-slate-400 hover:text-white rounded-xl bg-slate-900/80 border border-white/10"
+              className="lg:hidden p-2 text-amber-300 hover:text-amber-100 rounded-xl bg-amber-950/80 border border-amber-500/30"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -724,22 +724,22 @@ export function App() {
               className="flex items-center space-x-3 cursor-pointer group"
               onClick={() => setActiveTab('events')}
             >
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-400 via-sky-400 to-purple-500 p-0.5 shadow-lg shadow-emerald-500/30 group-hover:scale-105 transition-all">
-                <div className="w-full h-full bg-[#030712] rounded-[14px] flex items-center justify-center">
-                  <Flame className="w-5 h-5 text-emerald-400" />
+              <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-amber-500 via-amber-700 to-amber-900 p-0.5 shadow-lg shadow-amber-900/40 group-hover:scale-105 transition-all">
+                <div className="w-full h-full bg-[#181310] rounded-[14px] flex items-center justify-center border border-amber-500/40">
+                  <Flame className="w-5 h-5 text-amber-400" />
                 </div>
               </div>
               <div>
                 <div className="flex items-center space-x-2">
-                  <h1 className="text-xl font-extrabold tracking-tight text-white font-mono gradient-text-neon">
+                  <h1 className="text-2xl font-black tracking-tight text-amber-100 font-cinzel gradient-text-neon">
                     EventOps
                   </h1>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                    MVP v0.8
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase bg-amber-500/15 text-amber-300 border border-amber-500/40 vintage-stamp">
+                    EST. 2026
                   </span>
                 </div>
-                <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
-                  Community &amp; Event Collaboration Platform
+                <p className="text-[11px] text-amber-400/80 font-serif-vintage italic hidden sm:block">
+                  The Official Gazette &amp; Guild Dispatch Portal
                 </p>
               </div>
             </div>
@@ -747,38 +747,39 @@ export function App() {
 
           <div className="flex items-center space-x-4">
             {health && (
-              <span className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 shadow-inner">
+              <span className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-mono bg-amber-950/80 text-amber-300 border border-amber-500/40 shadow-inner">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
                 </span>
-                API Healthy
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+                Guild Dispatch Online
               </span>
             )}
 
             {user ? (
               <div className="flex items-center space-x-3">
                 <div className="hidden md:block text-right">
-                  <div className="text-xs font-bold text-white flex items-center gap-1.5 justify-end">
+                  <div className="text-xs font-bold text-amber-100 flex items-center gap-1.5 justify-end font-cinzel">
                     {user.name}
                     {isPlatformAdmin && (
-                      <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded-md">
-                        Admin
+                      <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded-md">
+                        Grandmaster
                       </span>
                     )}
                   </div>
-                  <div className="text-[11px] text-slate-400 font-mono">{user.email}</div>
+                  <div className="text-[11px] text-amber-400/70 font-mono">{user.email}</div>
                 </div>
 
-                <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-emerald-400 to-purple-500 p-0.5 flex items-center justify-center font-bold text-slate-950 text-xs shadow-xl">
-                  <div className="w-full h-full bg-[#030712] rounded-[14px] flex items-center justify-center text-white">
+                <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-800 p-0.5 flex items-center justify-center font-bold text-amber-950 text-xs shadow-xl">
+                  <div className="w-full h-full bg-[#181310] rounded-[14px] flex items-center justify-center text-amber-200 font-cinzel">
                     {user.name.slice(0, 2).toUpperCase()}
                   </div>
                 </div>
 
                 <button
                   onClick={handleLogout}
-                  className="p-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition border border-transparent hover:border-rose-500/20"
+                  className="p-2 text-amber-400/70 hover:text-rose-400 hover:bg-rose-950/40 rounded-xl transition border border-transparent hover:border-rose-500/30"
                   title="Sign Out"
                 >
                   <LogOut className="w-4 h-4" />
@@ -793,29 +794,29 @@ export function App() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-8 relative z-10 flex flex-col lg:flex-row gap-8">
         {!user ? (
           /* Glassmorphic Authentication Screen with Instant 1-Click Demo Accounts */
-          <div className="max-w-xl w-full mx-auto my-auto glass-panel-deep border border-white/10 rounded-3xl p-8 shadow-2xl relative overflow-hidden space-y-6">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="max-w-xl w-full mx-auto my-auto glass-panel-deep border-2 border-amber-500/40 rounded-3xl p-8 shadow-2xl relative overflow-hidden space-y-6">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="text-center space-y-2">
-              <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-emerald-500/20 via-teal-500/20 to-purple-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 glow-orb-emerald animate-float">
-                <Sparkles className="w-8 h-8" />
+              <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-amber-500/20 via-amber-700/20 to-amber-900/20 border-2 border-amber-500/50 flex items-center justify-center text-amber-400 glow-orb-emerald animate-float shadow-xl">
+                <Sparkles className="w-8 h-8 text-amber-300" />
               </div>
-              <h2 className="text-3xl font-extrabold text-white tracking-tight">
-                EventOps Portal
+              <h2 className="text-3xl font-extrabold text-amber-100 tracking-tight font-cinzel">
+                EventOps Gazette &amp; Guild
               </h2>
-              <p className="text-xs text-slate-400 max-w-md mx-auto">
-                Discover events, co-host with partner communities, and manage sponsorships with zero member PII exposure.
+              <p className="text-xs text-amber-300/70 max-w-md mx-auto font-serif-vintage italic">
+                Discover assemblies, co-host with partner guilds, and steward sponsorships with zero member PII exposure.
               </p>
             </div>
 
             {/* Instant Demo Accounts Quick Sign-In Bar */}
-            <div className="p-4 bg-slate-950/80 border border-emerald-500/30 rounded-2xl space-y-3">
+            <div className="p-4 bg-[#120e0b]/90 border border-amber-500/40 rounded-2xl space-y-3">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-emerald-400 flex items-center gap-1.5">
-                  <Zap className="w-4 h-4 text-emerald-400" />
-                  1-Click Instant Demo Sign In
+                <span className="font-bold text-amber-300 flex items-center gap-1.5 font-cinzel">
+                  <Zap className="w-4 h-4 text-amber-400" />
+                  Instant Member Passport Authorization
                 </span>
-                <span className="text-[10px] text-slate-400 font-mono">No Setup Needed</span>
+                <span className="text-[10px] text-amber-400/70 font-mono">1-Click Dispatch</span>
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {DEMO_ACCOUNTS.slice(0, 4).map((demo) => (
@@ -823,12 +824,12 @@ export function App() {
                     key={demo.email}
                     type="button"
                     onClick={() => handleQuickDemoSignIn(demo)}
-                    className="p-2.5 bg-slate-900/90 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-500/40 rounded-xl text-left transition flex flex-col justify-between group"
+                    className="p-2.5 bg-[#1b1512] hover:bg-amber-950/60 border border-amber-900/40 hover:border-amber-500/60 rounded-xl text-left transition flex flex-col justify-between group"
                   >
-                    <span className="text-xs font-bold text-white group-hover:text-emerald-300 transition">
+                    <span className="text-xs font-bold text-amber-100 group-hover:text-amber-300 transition font-cinzel">
                       {demo.label}
                     </span>
-                    <span className="text-[10px] text-slate-500 truncate mt-0.5">{demo.desc}</span>
+                    <span className="text-[10px] text-amber-400/60 truncate mt-0.5">{demo.desc}</span>
                   </button>
                 ))}
               </div>
