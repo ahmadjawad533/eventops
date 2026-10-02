@@ -705,299 +705,201 @@ export function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-zinc-100 flex flex-col font-sans relative overflow-x-hidden selection:bg-zinc-800 selection:text-white">
-      {/* Sleek Matte Top Bar */}
-      <header className="sticky top-0 z-40 bg-[#121215] border-b border-zinc-800/80 px-4 md:px-6 py-3 flex items-center justify-between shadow-lg">
-        <div className="flex items-center space-x-4 flex-1">
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 text-zinc-400 hover:text-white rounded-xl bg-zinc-900 border border-zinc-800"
-          >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+    <div className="min-h-screen bg-[#000000] text-zinc-100 flex items-center justify-center p-2 sm:p-4 md:p-6 font-sans selection:bg-zinc-800 selection:text-white">
+      {/* Centered Dashboard Workspace Container matching Screenshot 1 */}
+      <div className="w-full max-w-[1120px] bg-[#0c0c0e] border border-zinc-800/80 rounded-2xl shadow-2xl overflow-hidden flex flex-col min-h-[720px]">
+        {/* Compact Top Header Bar */}
+        <header className="bg-[#121215] border-b border-zinc-800/80 px-4 py-2.5 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-1.5 text-zinc-400 hover:text-white rounded-lg bg-zinc-900 border border-zinc-800"
+            >
+              {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+            </button>
 
-          {/* Top Wide Search Input */}
-          <div className="relative hidden sm:block w-72 md:w-96">
-            <Search className="w-4 h-4 absolute left-3 top-2.5 text-zinc-400" />
-            <input
-              type="text"
-              value={searchEventQuery}
-              onChange={(e) => setSearchEventQuery(e.target.value)}
-              placeholder="Search events, communities, venues..."
-              className="w-full bg-[#18181c] border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 rounded-xl pl-9 pr-12 py-2 focus:outline-none focus:border-zinc-600 transition"
-            />
-            <span className="text-[10px] font-mono text-zinc-500 bg-zinc-800/80 border border-zinc-700/50 px-1.5 py-0.5 rounded absolute right-2.5 top-2">
-              ⌘K
+            {/* Compact Search Input */}
+            <div className="relative w-56 sm:w-64">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-zinc-500" />
+              <input
+                type="text"
+                value={searchEventQuery}
+                onChange={(e) => setSearchEventQuery(e.target.value)}
+                placeholder="Search..."
+                className="w-full bg-[#18181b] border border-zinc-800 text-xs text-zinc-200 placeholder-zinc-500 rounded-lg pl-8 pr-3 py-1.5 focus:outline-none focus:border-zinc-600 transition"
+              />
+            </div>
+          </div>
+
+          {/* Status Pill & Action Icons */}
+          <div className="flex items-center space-x-2.5">
+            {health && (
+              <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-0.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-[11px] font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Systems Online</span>
+              </div>
+            )}
+
+            <button
+              className="p-1.5 rounded-lg bg-[#18181b] border border-zinc-800 text-zinc-400 hover:text-white transition relative"
+              title="Notifications"
+            >
+              <Bell className="w-3.5 h-3.5" />
+              <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+            </button>
+
+            <button
+              className="p-1.5 rounded-lg bg-[#18181b] border border-zinc-800 text-zinc-400 hover:text-white transition"
+              title="Settings"
+            >
+              <Settings className="w-3.5 h-3.5" />
+            </button>
+
+            <span className="px-2.5 py-1 bg-[#18181b] border border-zinc-800 text-zinc-300 font-mono text-[10px] font-bold tracking-wider rounded-lg uppercase">
+              {roles[0]?.role_type || RoleType.ORGANIZER}
             </span>
           </div>
-        </div>
+        </header>
 
-        {/* Right Action Icons & Status */}
-        <div className="flex items-center space-x-3">
-          {health && (
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full text-xs font-medium">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-              </span>
-              <span>Systems Online</span>
-            </div>
-          )}
-
-          <button
-            className="p-2 rounded-xl bg-[#18181c] border border-zinc-800 text-zinc-400 hover:text-white transition relative"
-            title="Notifications"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full" />
-          </button>
-
-          <button
-            className="p-2 rounded-xl bg-[#18181c] border border-zinc-800 text-zinc-400 hover:text-white transition"
-            title="Settings"
-          >
-            <Settings className="w-4 h-4" />
-          </button>
-
-          {user && (
-            <div className="flex items-center space-x-2 pl-3 border-l border-zinc-800">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-zinc-700 to-zinc-900 border border-zinc-700 flex items-center justify-center text-xs font-bold text-white shadow">
-                {user.name.slice(0, 2).toUpperCase()}
-              </div>
-              <div className="hidden md:block text-left">
-                <div className="text-xs font-semibold text-zinc-200">{user.name}</div>
-                <div className="text-[10px] text-emerald-400 font-mono font-bold uppercase tracking-wider">
-                  {roles[0]?.role_type || RoleType.ORGANIZER}
+        {/* Workspace Body Layout */}
+        <div className="flex flex-1 min-h-0">
+          {!user ? (
+            /* Compact Auth Screen */
+            <div className="max-w-md w-full mx-auto my-auto p-6 bg-[#121215] border border-zinc-800 rounded-2xl shadow-xl space-y-4">
+              <div className="text-center space-y-1">
+                <div className="w-10 h-10 mx-auto rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-emerald-400">
+                  <Zap className="w-5 h-5" />
                 </div>
+                <h2 className="text-xl font-bold text-white">EventOps Portal</h2>
+                <p className="text-xs text-zinc-400">Sign in to access your event dashboard</p>
               </div>
-            </div>
-          )}
-        </div>
-      </header>
 
-      {/* Main Container Layout */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-8 py-8 relative z-10 flex flex-col lg:flex-row gap-8">
-        {!user ? (
-          /* Glassmorphic Authentication Screen with Instant 1-Click Demo Accounts */
-          <div className="max-w-xl w-full mx-auto my-auto glass-panel-deep border-2 border-amber-500/40 rounded-3xl p-8 shadow-2xl relative overflow-hidden space-y-6">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
-            <div className="text-center space-y-2">
-              <div className="w-16 h-16 mx-auto rounded-3xl bg-gradient-to-br from-amber-500/20 via-amber-700/20 to-amber-900/20 border-2 border-amber-500/50 flex items-center justify-center text-amber-400 glow-orb-emerald animate-float shadow-xl">
-                <Sparkles className="w-8 h-8 text-amber-300" />
-              </div>
-              <h2 className="text-3xl font-extrabold text-amber-100 tracking-tight font-cinzel">
-                EventOps Gazette &amp; Guild
-              </h2>
-              <p className="text-xs text-amber-300/70 max-w-md mx-auto font-serif-vintage italic">
-                Discover assemblies, co-host with partner guilds, and steward sponsorships with zero member PII exposure.
-              </p>
-            </div>
-
-            {/* Instant Demo Accounts Quick Sign-In Bar */}
-            <div className="p-4 bg-[#120e0b]/90 border border-amber-500/40 rounded-2xl space-y-3">
-              <div className="flex items-center justify-between text-xs">
-                <span className="font-bold text-amber-300 flex items-center gap-1.5 font-cinzel">
-                  <Zap className="w-4 h-4 text-amber-400" />
-                  Instant Member Passport Authorization
-                </span>
-                <span className="text-[10px] text-amber-400/70 font-mono">1-Click Dispatch</span>
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {DEMO_ACCOUNTS.slice(0, 4).map((demo) => (
-                  <button
-                    key={demo.email}
-                    type="button"
-                    onClick={() => handleQuickDemoSignIn(demo)}
-                    className="p-2.5 bg-[#1b1512] hover:bg-amber-950/60 border border-amber-900/40 hover:border-amber-500/60 rounded-xl text-left transition flex flex-col justify-between group"
-                  >
-                    <span className="text-xs font-bold text-amber-100 group-hover:text-amber-300 transition font-cinzel">
-                      {demo.label}
-                    </span>
-                    <span className="text-[10px] text-amber-400/60 truncate mt-0.5">{demo.desc}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 p-1 bg-slate-950/90 rounded-2xl border border-white/10">
-              <button
-                type="button"
-                onClick={() => setAuthMode('login')}
-                className={`py-2.5 text-xs font-bold rounded-xl transition ${
-                  authMode === 'login'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-950'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => setAuthMode('register')}
-                className={`py-2.5 text-xs font-bold rounded-xl transition ${
-                  authMode === 'register'
-                    ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-lg shadow-emerald-950'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                Register Custom Account
-              </button>
-            </div>
-
-            {authError && (
-              <div className="p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl text-rose-400 text-xs flex items-center space-x-2">
-                <ShieldAlert className="w-4 h-4 shrink-0" />
-                <span>{authError}</span>
-              </div>
-            )}
-
-            {authSuccess && (
-              <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-emerald-400 text-xs flex items-center space-x-2">
-                <CheckCircle2 className="w-4 h-4 shrink-0" />
-                <span>{authSuccess}</span>
-              </div>
-            )}
-
-            {authMode === 'login' ? (
-              <form onSubmit={handleLogin} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="organizer@summit.org"
-                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Password</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="Password123!"
-                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
-                  />
-                </div>
+              <div className="grid grid-cols-2 p-1 bg-zinc-950 rounded-xl border border-zinc-800 text-xs">
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3 px-4 glass-button-primary text-white font-bold rounded-xl text-xs transition shadow-xl disabled:opacity-50 mt-2"
+                  type="button"
+                  onClick={() => setAuthMode('login')}
+                  className={`py-1.5 font-bold rounded-lg transition ${
+                    authMode === 'login' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
+                  }`}
                 >
-                  {isSubmitting ? 'Signing in...' : 'Sign In to Portal'}
+                  Sign In
                 </button>
-              </form>
-            ) : (
-              <form onSubmit={handleRegister} className="space-y-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Full Name</label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    required
-                    placeholder="Olivia Organizer"
-                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Email Address</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="organizer@summit.org"
-                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Password</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    placeholder="••••••••"
-                    className="w-full px-4 py-3 glass-input-glow rounded-xl text-xs"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">Primary Roles</label>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    {[RoleType.ORGANIZER, RoleType.COMMUNITY_ADMIN, RoleType.ATTENDEE, RoleType.SPONSOR].map(
-                      (role) => (
-                        <label
-                          key={role}
-                          className={`flex items-center space-x-2 p-2.5 rounded-xl border cursor-pointer transition ${
-                            selectedRoles.includes(role)
-                              ? 'bg-emerald-500/15 border-emerald-500/60 text-emerald-300 font-semibold'
-                              : 'bg-slate-950/60 border-white/10 text-slate-400 hover:text-slate-200'
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedRoles.includes(role)}
-                            onChange={(e) => {
-                              if (e.target.checked) setSelectedRoles([...selectedRoles, role]);
-                              else setSelectedRoles(selectedRoles.filter((r) => r !== role));
-                            }}
-                            className="hidden"
-                          />
-                          <span className="text-[11px] font-mono">{role}</span>
-                        </label>
-                      )
-                    )}
+                <button
+                  type="button"
+                  onClick={() => setAuthMode('register')}
+                  className={`py-1.5 font-bold rounded-lg transition ${
+                    authMode === 'register' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  Register
+                </button>
+              </div>
+
+              {authError && <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-xs">{authError}</div>}
+              {authSuccess && <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs">{authSuccess}</div>}
+
+              {authMode === 'login' ? (
+                <form onSubmit={handleLogin} className="space-y-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                    />
                   </div>
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3 px-4 glass-button-primary text-white font-bold rounded-xl text-xs transition shadow-xl disabled:opacity-50 mt-2"
-                >
-                  {isSubmitting ? 'Creating Account...' : 'Complete Registration'}
-                </button>
-              </form>
-            )}
-          </div>
-        ) : (
-          /* Logged In Dashboard Layout */
-          <>
-            {/* Sleek Matte Sidebar Navigation */}
-            <aside
-              className={`fixed inset-y-0 left-0 z-30 w-64 bg-[#141417] border-r border-zinc-800/80 p-4 transform transition-transform duration-300 lg:relative lg:translate-x-0 rounded-2xl shrink-0 flex flex-col justify-between ${
-                mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
-              }`}
-            >
-              <div className="space-y-6">
-                {/* Brand Header */}
-                <div className="flex items-center justify-between px-2 pt-1">
-                  <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('events')}>
-                    <div className="w-9 h-9 rounded-xl bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-white font-bold shadow-md">
-                      <Zap className="w-5 h-5 text-emerald-400" />
-                    </div>
-                    <div>
-                      <h1 className="text-lg font-extrabold text-white tracking-tight">EventOps</h1>
-                      <div className="text-[10px] text-zinc-400 font-mono">v2.4 Production</div>
-                    </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                    />
                   </div>
                   <button
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="lg:hidden text-zinc-400 hover:text-white"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-2 bg-white text-black font-bold text-xs rounded-lg hover:bg-zinc-200 transition"
                   >
-                    <X className="w-5 h-5" />
+                    {isSubmitting ? 'Signing in...' : 'Sign In'}
                   </button>
-                </div>
-
-                {/* Nav Links */}
-                <div>
-                  <div className="text-[10px] font-mono font-bold uppercase tracking-wider text-zinc-500 px-3 mb-2">
-                    Navigation
+                </form>
+              ) : (
+                <form onSubmit={handleRegister} className="space-y-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Full Name</label>
+                    <input
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                    />
                   </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Email</label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-2 bg-white text-black font-bold text-xs rounded-lg hover:bg-zinc-200 transition"
+                  >
+                    {isSubmitting ? 'Creating Account...' : 'Complete Registration'}
+                  </button>
+                </form>
+              )}
+            </div>
+          ) : (
+            /* Logged In Dashboard Layout matching Screenshot 1 */
+            <>
+              {/* Narrow 165px Sidebar */}
+              <aside
+                className={`fixed inset-y-0 left-0 z-30 w-[165px] bg-[#0c0c0e] border-r border-zinc-800/80 p-3 flex flex-col justify-between shrink-0 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
+                  mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                }`}
+              >
+                <div className="space-y-4">
+                  {/* Brand Header */}
+                  <div className="flex items-center justify-between px-1">
+                    <div
+                      className="flex items-center space-x-2 cursor-pointer"
+                      onClick={() => setActiveTab('events')}
+                    >
+                      <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-white font-bold">
+                        <Zap className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="text-sm font-extrabold text-white tracking-tight">EventOps</span>
+                    </div>
+                    <button
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="lg:hidden text-zinc-500 hover:text-zinc-300"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Navigation List */}
                   <nav className="space-y-1">
                     {navigationItems.map((item) => {
                       const Icon = item.icon;
@@ -1009,284 +911,262 @@ export function App() {
                             setActiveTab(item.id as any);
                             setMobileMenuOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-semibold transition ${
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition ${
                             isActive
-                              ? 'bg-white text-black shadow-md'
+                              ? 'bg-white text-black shadow-sm'
                               : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
                           }`}
                         >
-                          <div className="flex items-center space-x-3">
-                            <Icon className={`w-4 h-4 ${isActive ? 'text-black' : 'text-zinc-400'}`} />
-                            <span>{item.label}</span>
+                          <div className="flex items-center space-x-2 truncate">
+                            <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-black' : 'text-zinc-400'}`} />
+                            <span className="truncate">{item.label}</span>
                           </div>
-                          {item.badge !== undefined && (
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                                isActive ? 'bg-zinc-200 text-black' : 'bg-zinc-800 text-zinc-300'
-                              }`}
-                            >
-                              {item.badge}
-                            </span>
-                          )}
                         </button>
                       );
                     })}
                   </nav>
                 </div>
-              </div>
 
-              {/* Sidebar User Profile Card & Quick Actions */}
-              {user && (
-                <div className="pt-4 border-t border-zinc-800/80">
-                  <div className="bg-[#18181c] border border-zinc-800/80 rounded-xl p-3 flex items-center justify-between">
-                    <div className="flex items-center space-x-3 truncate">
-                      <div className="w-8 h-8 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center font-bold text-xs text-white shrink-0">
-                        {user.name.slice(0, 2).toUpperCase()}
+                {/* Sidebar User Profile Section */}
+                {user && (
+                  <div className="pt-3 border-t border-zinc-800/80">
+                    <div className="bg-[#141417] border border-zinc-800/80 rounded-lg p-2 flex items-center justify-between">
+                      <div className="flex items-center space-x-2 truncate">
+                        <div className="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+                          {user.name.slice(0, 2).toUpperCase()}
+                        </div>
+                        <div className="truncate text-left">
+                          <div className="text-[11px] font-bold text-white truncate">{user.name}</div>
+                          <div className="text-[9px] text-zinc-500 truncate">{user.email}</div>
+                        </div>
                       </div>
-                      <div className="truncate text-left">
-                        <div className="text-xs font-semibold text-white truncate">{user.name}</div>
-                        <div className="text-[10px] text-zinc-400 truncate">{user.email}</div>
-                      </div>
+                      <button
+                        onClick={handleLogout}
+                        className="p-1 text-zinc-400 hover:text-rose-400 rounded transition shrink-0"
+                        title="Sign Out"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                      </button>
                     </div>
-                    <button
-                      onClick={handleLogout}
-                      className="p-1.5 text-zinc-400 hover:text-rose-400 rounded-lg hover:bg-zinc-800 transition shrink-0"
-                      title="Sign Out"
-                    >
-                      <LogOut className="w-4 h-4" />
+                  </div>
+                )}
+              </aside>
+
+              {/* Main Content Area */}
+              <div className="flex-1 bg-[#09090b] p-5 space-y-5 overflow-y-auto min-w-0">
+                {eventActionMsg && (
+                  <div className="p-3 bg-[#121215] border border-emerald-500/40 rounded-xl text-emerald-400 text-xs flex justify-between items-center shadow">
+                    <div className="flex items-center space-x-2">
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                      <span>{eventActionMsg}</span>
+                    </div>
+                    <button onClick={() => setEventActionMsg(null)} className="text-zinc-400 hover:text-white">
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
-                </div>
-              )}
-            </aside>
+                )}
 
-            {/* Main Content Area */}
-            <div className="flex-1 space-y-6 min-w-0">
-              {eventActionMsg && (
-                <div className="p-4 bg-[#141417] border border-emerald-500/40 rounded-2xl text-emerald-400 text-xs flex justify-between items-center shadow-xl">
-                  <div className="flex items-center space-x-2">
-                    <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
-                    <span>{eventActionMsg}</span>
-                  </div>
-                  <button onClick={() => setEventActionMsg(null)} className="text-zinc-400 hover:text-white">
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              )}
+                {/* TAB 1: EVENTS DISCOVERY & MANAGEMENT */}
+                {activeTab === 'events' && (
+                  <div className="space-y-5">
+                    {/* Page Header & Filter Controls matching Screenshot 1 */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                      <div>
+                        <h1 className="text-lg font-bold text-white tracking-tight">Events &amp; VIP Tickets</h1>
+                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                          Manage your event presence and discover new opportunities.
+                        </p>
+                      </div>
 
-              {/* TAB 1: EVENTS DISCOVERY & MANAGEMENT */}
-              {activeTab === 'events' && (
-                <div className="space-y-6">
-                  {/* Top Bar Header & Action Controls matching Screenshot */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-zinc-800/60">
-                    <div>
-                      <h1 className="text-2xl font-bold text-white tracking-tight">Events &amp; VIP Tickets</h1>
-                      <p className="text-xs text-zinc-400 mt-0.5">
-                        Manage RSVPs, ticket verification &amp; attendee check-ins
-                      </p>
-                    </div>
+                      {/* Right Action Bar */}
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <button className="px-3 py-1 bg-white text-black text-[11px] font-bold rounded-full shadow-sm">
+                          All
+                        </button>
+                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-full text-[11px] transition">
+                          Tech
+                        </button>
+                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-full text-[11px] transition">
+                          Workshop
+                        </button>
+                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-full text-[11px] transition">
+                          Hackathon
+                        </button>
 
-                    {/* Filter Pills & Actions */}
-                    <div className="flex flex-wrap items-center gap-2">
-                      <button className="px-3.5 py-1.5 bg-white text-black font-semibold rounded-xl text-xs shadow">
-                        All
-                      </button>
-                      <button className="px-3.5 py-1.5 bg-[#18181c] text-zinc-400 hover:text-white border border-zinc-800 rounded-xl text-xs transition">
-                        Tech
-                      </button>
-                      <button className="px-3.5 py-1.5 bg-[#18181c] text-zinc-400 hover:text-white border border-zinc-800 rounded-xl text-xs transition">
-                        Workshop
-                      </button>
-                      <button className="px-3.5 py-1.5 bg-[#18181c] text-zinc-400 hover:text-white border border-zinc-800 rounded-xl text-xs transition">
-                        Hackathon
-                      </button>
-
-                      <button
-                        className="p-2 bg-[#18181c] border border-zinc-800 text-zinc-400 hover:text-white rounded-xl transition"
-                        title="Advanced Filters"
-                      >
-                        <SlidersHorizontal className="w-4 h-4" />
-                      </button>
-
-                      <button
-                        onClick={() => setShowCreateEventModal(true)}
-                        className="px-4 py-2 bg-white text-black font-semibold text-xs rounded-xl hover:bg-zinc-200 transition flex items-center gap-1.5 shadow"
-                      >
-                        <Plus className="w-4 h-4" />
-                        <span>Create Event</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 3-Column Event Grid matching Screenshot */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                    {filteredEvents.map((ev) => {
-                      const startDate = new Date(ev.start_date);
-                      const isPublished = ev.status === EventStatus.PUBLISHED;
-                      return (
-                        <div
-                          key={ev.id}
-                          className="bg-[#141417] border border-zinc-800/80 rounded-2xl overflow-hidden hover:border-zinc-700 transition flex flex-col justify-between group shadow-lg"
+                        <button
+                          className="p-1.5 bg-[#141417] border border-zinc-800 text-zinc-400 hover:text-white rounded-lg transition"
+                          title="Filter Options"
                         >
-                          {/* Card Banner Container */}
-                          <div className="h-40 w-full relative overflow-hidden bg-gradient-to-br from-zinc-800 via-zinc-900 to-black border-b border-zinc-800/80 flex items-center justify-center">
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#141417] via-transparent to-transparent z-10" />
-                            <Calendar className="w-12 h-12 text-zinc-700 opacity-40 group-hover:scale-110 transition duration-300" />
+                          <SlidersHorizontal className="w-3.5 h-3.5" />
+                        </button>
 
-                            {/* Format Pill Overlay */}
-                            <div className="absolute top-3 left-3 z-20">
-                              <span className="bg-black/60 backdrop-blur-md text-zinc-200 text-[10px] font-semibold px-2.5 py-1 rounded-full border border-white/10">
-                                {ev.format}
-                              </span>
-                            </div>
+                        <button
+                          onClick={() => setShowCreateEventModal(true)}
+                          className="px-3 py-1.5 bg-white hover:bg-zinc-200 text-black text-[11px] font-bold rounded-lg flex items-center gap-1 transition shadow"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Create Event</span>
+                        </button>
+                      </div>
+                    </div>
 
-                            {/* Status Pill Overlay */}
-                            <div className="absolute top-3 right-3 z-20">
-                              <span
-                                className={`text-[10px] font-mono font-bold uppercase px-2.5 py-0.5 rounded-full border ${
-                                  isPublished
-                                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                                    : 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                                }`}
-                              >
-                                {ev.status}
-                              </span>
-                            </div>
-                          </div>
+                    {/* 3-Column Event Card Grid matching Screenshot 1 */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                      {filteredEvents.map((ev) => {
+                        const startDate = new Date(ev.start_date);
+                        const isPublished = ev.status === EventStatus.PUBLISHED;
+                        return (
+                          <div
+                            key={ev.id}
+                            className="bg-[#121215] border border-zinc-800/80 rounded-xl overflow-hidden flex flex-col justify-between group shadow-sm hover:border-zinc-700 transition"
+                          >
+                            {/* Card Image Banner */}
+                            <div className="h-32 w-full relative overflow-hidden bg-gradient-to-br from-zinc-800 via-zinc-900 to-black border-b border-zinc-800/80 flex items-center justify-center">
+                              <Calendar className="w-8 h-8 text-zinc-700 opacity-40 group-hover:scale-105 transition duration-300" />
 
-                          {/* Card Content Body */}
-                          <div className="p-4 space-y-3">
-                            <div className="flex items-center justify-between text-[11px] text-zinc-400">
-                              <span className="text-emerald-400 font-semibold uppercase tracking-wider text-[10px]">
-                                {ev.category}
-                              </span>
-                              <div className="flex items-center space-x-1 text-zinc-400">
-                                <Clock className="w-3.5 h-3.5 text-zinc-500" />
-                                <span>
-                                  {startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {/* Format Pill Overlay */}
+                              <div className="absolute top-2 left-2 z-10">
+                                <span className="bg-black/70 backdrop-blur-md text-zinc-200 text-[9px] font-semibold px-2 py-0.5 rounded-full border border-white/10">
+                                  {ev.format}
                                 </span>
+                              </div>
+
+                              {/* Action Menu Icon */}
+                              <div className="absolute top-2 right-2 z-10">
+                                <button className="p-1 text-zinc-400 hover:text-white">
+                                  <MoreVertical className="w-3.5 h-3.5" />
+                                </button>
                               </div>
                             </div>
 
-                            <div>
-                              <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition line-clamp-1">
+                            {/* Card Body */}
+                            <div className="p-3 space-y-2">
+                              <div className="text-[9px] font-bold text-zinc-400 flex items-center gap-1 uppercase tracking-wider">
+                                <span>⚡</span>
+                                <span>{ev.category} Hub</span>
+                              </div>
+
+                              <h3 className="text-xs font-bold text-white group-hover:text-emerald-400 transition line-clamp-1">
                                 {ev.title}
                               </h3>
-                              <p className="text-xs text-zinc-400 mt-1 line-clamp-2 leading-relaxed">
-                                {ev.description}
-                              </p>
-                            </div>
 
-                            <div className="flex items-center space-x-1.5 text-xs text-zinc-400 pt-1">
-                              <MapPin className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
-                              <span className="truncate">{ev.location || 'San Francisco, CA • Moscone Center'}</span>
-                            </div>
-
-                            {/* Seats Capacity Bar */}
-                            <div className="space-y-1 pt-2">
-                              <div className="flex justify-between text-[11px] text-zinc-400">
-                                <span>Seats Reserved</span>
-                                <span className="font-mono text-zinc-200 font-semibold">
-                                  {ev.registered_count} / {ev.capacity}
-                                </span>
+                              <div className="space-y-1 text-[10px] text-zinc-400">
+                                <div className="flex items-center gap-1.5">
+                                  <Clock className="w-3 h-3 text-zinc-500 shrink-0" />
+                                  <span>
+                                    {startDate.toLocaleDateString('en-US', {
+                                      month: 'short',
+                                      day: 'numeric',
+                                      year: 'numeric',
+                                    })}{' '}
+                                    • 09:00 AM
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <MapPin className="w-3 h-3 text-zinc-500 shrink-0" />
+                                  <span className="truncate">{ev.location || 'San Francisco, CA'}</span>
+                                </div>
                               </div>
-                              <div className="w-full bg-zinc-800/80 h-1.5 rounded-full overflow-hidden">
-                                <div
-                                  className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-500"
-                                  style={{
-                                    width: `${Math.min(100, (ev.registered_count / ev.capacity) * 100)}%`,
-                                  }}
-                                />
+
+                              {/* Capacity Progress Bar */}
+                              <div className="space-y-1 pt-1">
+                                <div className="flex justify-between text-[9px] text-zinc-400 font-mono">
+                                  <span>
+                                    Capacity: {Math.round((ev.registered_count / ev.capacity) * 100)}%
+                                  </span>
+                                  <span>
+                                    {ev.registered_count}/{ev.capacity}
+                                  </span>
+                                </div>
+                                <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
+                                  <div
+                                    className="bg-white h-full rounded-full transition-all duration-300"
+                                    style={{
+                                      width: `${Math.min(100, (ev.registered_count / ev.capacity) * 100)}%`,
+                                    }}
+                                  />
+                                </div>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Card Actions Footer */}
-                          <div className="p-4 pt-0 flex items-center gap-2">
-                            {isPublished ? (
+                            {/* Card Action Row */}
+                            <div className="p-3 pt-0 flex items-center gap-1.5">
+                              {isPublished ? (
+                                <button
+                                  onClick={() => handleRegisterEvent(ev.id)}
+                                  className="flex-1 py-1.5 bg-[#27272a] hover:bg-[#323238] text-zinc-200 hover:text-white font-semibold text-[11px] rounded-lg transition text-center"
+                                >
+                                  RSVP Now
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handlePublishEvent(ev.id)}
+                                  className="flex-1 py-1.5 bg-emerald-500/20 text-emerald-300 font-semibold text-[11px] rounded-lg border border-emerald-500/30 hover:bg-emerald-500/30 transition text-center"
+                                >
+                                  Publish
+                                </button>
+                              )}
+
                               <button
-                                onClick={() => handleRegisterEvent(ev.id)}
-                                className="flex-1 py-2 bg-white text-black font-semibold text-xs rounded-xl hover:bg-zinc-200 transition flex items-center justify-center gap-1.5 shadow"
+                                onClick={() => {
+                                  setCheckInEventId(ev.id);
+                                  setShowCheckInModal(true);
+                                }}
+                                className="p-1.5 bg-[#18181b] border border-zinc-800 text-zinc-400 hover:text-white rounded-lg transition"
+                                title="Check-In Entrance Scanner"
                               >
                                 <Ticket className="w-3.5 h-3.5" />
-                                <span>RSVP Now</span>
                               </button>
-                            ) : (
+
                               <button
-                                onClick={() => handlePublishEvent(ev.id)}
-                                className="flex-1 py-2 bg-emerald-500/20 text-emerald-300 font-semibold text-xs rounded-xl hover:bg-emerald-500/30 border border-emerald-500/30 transition flex items-center justify-center gap-1.5"
+                                className="p-1.5 bg-[#18181b] border border-zinc-800 text-zinc-400 hover:text-white rounded-lg transition"
+                                title="Expand Details"
                               >
-                                <Sparkles className="w-3.5 h-3.5" />
-                                <span>Publish</span>
+                                <Maximize2 className="w-3.5 h-3.5" />
                               </button>
-                            )}
-
-                            <button
-                              onClick={() => {
-                                setCheckInEventId(ev.id);
-                                setShowCheckInModal(true);
-                              }}
-                              className="p-2 bg-[#242429] text-zinc-300 hover:text-white rounded-xl border border-zinc-700/60 transition"
-                              title="Check-In Entrance Scanner"
-                            >
-                              <CheckCircle2 className="w-4 h-4" />
-                            </button>
-
-                            <button
-                              className="p-2 bg-[#242429] text-zinc-300 hover:text-white rounded-xl border border-zinc-700/60 transition"
-                              title="Full Event Details"
-                            >
-                              <Maximize2 className="w-4 h-4" />
-                            </button>
+                            </div>
                           </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Host Your Own Event Card matching Screenshot 1 (Col 1 only, non-stretched!) */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                      <div
+                        onClick={() => setShowCreateEventModal(true)}
+                        className="bg-[#121215] border border-dashed border-zinc-800 hover:border-zinc-700 transition rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer min-h-[160px] group shadow-sm"
+                      >
+                        <div className="w-8 h-8 rounded-full bg-zinc-800/80 border border-zinc-700 flex items-center justify-center text-zinc-300 group-hover:bg-white group-hover:text-black transition mb-2">
+                          <Plus className="w-4 h-4" />
                         </div>
-                      );
-                    })}
-
-                    {/* Host Your Own Event Card matching Screenshot */}
-                    <div
-                      onClick={() => setShowCreateEventModal(true)}
-                      className="bg-[#141417] border border-dashed border-zinc-800 hover:border-zinc-600 transition rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer min-h-[320px] group shadow-lg"
-                    >
-                      <div className="w-12 h-12 rounded-full bg-zinc-800 border border-zinc-700/80 group-hover:bg-white group-hover:text-black text-zinc-300 transition flex items-center justify-center mb-3 shadow">
-                        <Plus className="w-6 h-6" />
+                        <h3 className="text-xs font-bold text-white group-hover:text-emerald-400 transition">
+                          Host Your Own Event
+                        </h3>
+                        <p className="text-[10px] text-zinc-500 mt-1 max-w-[150px] leading-snug">
+                          Create workshops, hackathons, or tech summits with EventOps.
+                        </p>
                       </div>
-                      <h3 className="text-sm font-bold text-white group-hover:text-emerald-400 transition">
-                        Host Your Own Event
-                      </h3>
-                      <p className="text-xs text-zinc-400 mt-1 max-w-[200px] leading-relaxed">
-                        Create a new event, manage RSVPs &amp; issue HMAC VIP tickets
-                      </p>
                     </div>
-                  </div>
 
-                  {/* Persona Switcher Bar at Bottom */}
-                  <div className="mt-8 p-4 bg-[#141417] border border-zinc-800/80 rounded-2xl space-y-3 shadow-lg">
-                    <div className="flex items-center justify-between text-xs font-semibold text-zinc-300">
-                      <span className="flex items-center gap-1.5">
-                        <Zap className="w-4 h-4 text-emerald-400" />
-                        1-Click Persona Switcher
-                      </span>
-                      <span className="text-[10px] text-emerald-400 font-mono">5 Active Roles</span>
-                    </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-                      {DEMO_ACCOUNTS.map((demo) => (
-                        <button
-                          key={demo.email}
-                          type="button"
-                          onClick={() => handleQuickDemoSignIn(demo)}
-                          className="p-2.5 bg-[#18181c] hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-xl text-left transition flex flex-col justify-between group"
-                        >
-                          <span className="text-xs font-bold text-zinc-200 group-hover:text-emerald-400 transition">
-                            {demo.label}
-                          </span>
-                          <span className="text-[10px] text-zinc-400 truncate mt-0.5">{demo.desc}</span>
-                        </button>
-                      ))}
+                    {/* Overlapping Persona Switcher Row at Center Bottom */}
+                    <div className="pt-2 flex justify-center">
+                      <div className="inline-flex items-center space-x-[-6px] bg-[#121215] border border-zinc-800/80 px-3 py-1.5 rounded-full shadow">
+                        <span className="text-[10px] font-semibold text-zinc-400 mr-2">Switch Persona:</span>
+                        {DEMO_ACCOUNTS.map((demo) => (
+                          <button
+                            key={demo.email}
+                            type="button"
+                            title={`${demo.name} (${demo.label})`}
+                            onClick={() => handleQuickDemoSignIn(demo)}
+                            className="w-6 h-6 rounded-full border border-zinc-700 bg-zinc-800 text-[9px] font-bold text-zinc-200 hover:scale-110 hover:border-white transition flex items-center justify-center shadow"
+                          >
+                            {demo.name.slice(0, 1)}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
               {/* TAB 2: COMMUNITIES HUB */}
               {activeTab === 'organizations' && (
@@ -1554,7 +1434,8 @@ export function App() {
             </div>
           </>
         )}
-      </main>
+        </div>
+      </div>
 
       {/* MODAL 1: TICKET DISPLAY WITH SIGNED QR CODE */}
       {activeTicket && (

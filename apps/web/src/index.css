@@ -8,13 +8,13 @@
   body {
     margin: 0;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #09090b;
+    background-color: #000000;
     color: #f4f4f5;
     overflow-x: hidden;
   }
 }
 
-/* Sleek Matte Dark Obsidian Design System (Exact Match) */
+/* Compact Dark Obsidian Design System (Strict Screenshot 1 Match) */
 .glass-panel-deep {
   background: #121215;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -22,69 +22,42 @@
 }
 
 .glass-card-neon {
-  background: #141417;
+  background: #121215;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s ease;
 }
 
 .glass-card-neon:hover {
-  background: #18181c;
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.9);
+  background: #16161a;
+  border-color: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
 }
 
 .glass-input-glow {
-  background: #141417;
+  background: #161619;
   border: 1px solid rgba(255, 255, 255, 0.1);
   color: #ffffff;
   transition: all 0.2s ease;
 }
 
 .glass-input-glow:focus {
-  background: #18181c;
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+  background: #1a1a1e;
+  border-color: rgba(255, 255, 255, 0.25);
   outline: none;
 }
 
-.glass-button-primary {
-  background: #ffffff;
-  color: #000000 !important;
-  font-weight: 700;
-  border: 1px solid #ffffff;
-  transition: all 0.2s ease;
-}
-
-.glass-button-primary:hover {
-  background: #e4e4e7;
-  transform: translateY(-1px);
-}
-
-.glass-button-secondary {
-  background: #242429;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  transition: all 0.2s ease;
-}
-
-.glass-button-secondary:hover {
-  background: #2f2f36;
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Scrollbar */
+/* Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: #000000;
 }
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.3);
 }
