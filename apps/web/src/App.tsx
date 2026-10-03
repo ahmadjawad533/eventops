@@ -818,8 +818,9 @@ export function App() {
         /* Full Viewport Width Logged-In Dashboard Layout */
         <div className="flex flex-1 w-full min-h-screen">
               {/* Narrow 165px Sidebar */}
+              {/* Narrow 165px Sidebar */}
               <aside
-                className={`fixed inset-y-0 left-0 z-30 w-[165px] bg-[#0c0c0e] border-r border-zinc-800/80 p-3 flex flex-col justify-between shrink-0 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
+                className={`fixed inset-y-0 left-0 z-30 w-[165px] bg-black/60 border-r border-white/10 p-3 flex flex-col justify-between shrink-0 backdrop-blur-xl transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
                   mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
               >
@@ -830,10 +831,10 @@ export function App() {
                       className="flex items-center space-x-2 cursor-pointer"
                       onClick={() => setActiveTab('events')}
                     >
-                      <div className="w-7 h-7 rounded-sm bg-zinc-900 border border-zinc-700/80 flex items-center justify-center text-white font-bold">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#7c3aed] to-[#00b4ff] shadow-[0_0_20px_rgba(124,58,237,0.4)] flex items-center justify-center text-white font-bold">
                         <Zap className="w-4 h-4 text-white" />
                       </div>
-                      <span className="text-sm font-extrabold text-white tracking-tight">EventOps</span>
+                      <span className="text-sm font-black tracking-tight gradient-text">EventOps</span>
                     </div>
                     <button
                       onClick={() => setMobileMenuOpen(false)}
@@ -855,14 +856,14 @@ export function App() {
                             setActiveTab(item.id as any);
                             setMobileMenuOpen(false);
                           }}
-                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-sm text-[11px] font-semibold transition ${
+                          className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-200 ${
                             isActive
-                              ? 'bg-white text-black shadow-sm'
-                              : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                              ? 'bg-gradient-to-r from-[#7c3aed] to-[#00b4ff] text-white shadow-[0_4px_20px_rgba(124,58,237,0.4)]'
+                              : 'text-zinc-400 hover:text-white hover:bg-white/10'
                           }`}
                         >
                           <div className="flex items-center space-x-2 truncate">
-                            <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-black' : 'text-zinc-400'}`} />
+                            <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-zinc-400'}`} />
                             <span className="truncate">{item.label}</span>
                           </div>
                         </button>
@@ -873,15 +874,17 @@ export function App() {
 
                 {/* Sidebar User Profile Section */}
                 {user && (
-                  <div className="pt-3 border-t border-zinc-800/80">
-                    <div className="bg-[#141417] border border-zinc-800/80 rounded-sm p-2 flex items-center justify-between">
+                  <div className="pt-3 border-t border-white/10">
+                    <div className="bg-white/[0.04] border border-white/10 rounded-lg p-2 flex items-center justify-between backdrop-blur-md">
                       <div className="flex items-center space-x-2 truncate">
-                        <div className="w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
-                          {user.name.slice(0, 2).toUpperCase()}
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#00ffc8] p-0.5 flex items-center justify-center text-[10px] font-bold text-black shrink-0 shadow-[0_0_10px_rgba(0,255,200,0.3)]">
+                          <div className="w-full h-full bg-[#050509] rounded-full flex items-center justify-center text-white">
+                            {user.name.slice(0, 2).toUpperCase()}
+                          </div>
                         </div>
                         <div className="truncate text-left">
                           <div className="text-[11px] font-bold text-white truncate">{user.name}</div>
-                          <div className="text-[9px] text-zinc-500 truncate">{user.email}</div>
+                          <div className="text-[9px] text-zinc-400 truncate">{user.email}</div>
                         </div>
                       </div>
                       <button
@@ -897,7 +900,7 @@ export function App() {
               </aside>
 
               {/* Main Content Area */}
-              <div className="flex-1 bg-[#09090b] flex flex-col min-w-0 overflow-y-auto">
+              <div className="flex-1 bg-transparent flex flex-col min-w-0 overflow-y-auto">
                 <TopHeader
                   searchQuery={searchEventQuery}
                   onSearchChange={setSearchEventQuery}
@@ -906,9 +909,9 @@ export function App() {
 
                 <div className="p-5 space-y-5 flex-1">
                 {eventActionMsg && (
-                  <div className="p-3 bg-[#121215] border border-emerald-500/40 rounded-xl text-emerald-400 text-xs flex justify-between items-center shadow">
+                  <div className="p-3 bg-[#00ffc8]/10 border border-[#00ffc8]/30 rounded-xl text-[#00ffc8] text-xs flex justify-between items-center shadow-[0_0_15px_rgba(0,255,200,0.15)] backdrop-blur-md">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-400" />
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-[#00ffc8]" />
                       <span>{eventActionMsg}</span>
                     </div>
                     <button onClick={() => setEventActionMsg(null)} className="text-zinc-400 hover:text-white">
@@ -920,10 +923,12 @@ export function App() {
                 {/* TAB 1: EVENTS DISCOVERY & MANAGEMENT */}
                 {activeTab === 'events' && (
                   <div className="space-y-5">
-                    {/* Page Header & Filter Controls matching Screenshot 1 */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    {/* Page Header & Filter Controls matching Vercel Portfolio Reference */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-b from-white/[0.05] to-white/[0.015] border border-white/10 p-4 rounded-xl backdrop-blur-md shadow-xl">
                       <div>
-                        <h1 className="text-lg font-bold text-white tracking-tight">Events &amp; VIP Tickets</h1>
+                        <h1 className="text-xl font-extrabold text-white tracking-tight gradient-text">
+                          Events &amp; VIP Tickets
+                        </h1>
                         <p className="text-[11px] text-zinc-400 mt-0.5">
                           Manage your event presence and discover new opportunities.
                         </p>
@@ -931,21 +936,21 @@ export function App() {
 
                       {/* Right Action Bar */}
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <button className="px-3 py-1 bg-white text-black text-[11px] font-bold rounded-sm shadow-sm">
+                        <button className="px-3 py-1 bg-gradient-to-r from-[#7c3aed] to-[#00b4ff] text-white text-[11px] font-bold rounded-full shadow-[0_4px_15px_rgba(124,58,237,0.3)]">
                           All
                         </button>
-                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-sm text-[11px] transition">
+                        <button className="px-3 py-1 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 rounded-full text-[11px] transition">
                           Tech
                         </button>
-                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-sm text-[11px] transition">
+                        <button className="px-3 py-1 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 rounded-full text-[11px] transition">
                           Workshop
                         </button>
-                        <button className="px-3 py-1 bg-[#141417] text-zinc-400 hover:text-white border border-zinc-800 rounded-sm text-[11px] transition">
+                        <button className="px-3 py-1 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 rounded-full text-[11px] transition">
                           Hackathon
                         </button>
 
                         <button
-                          className="p-1.5 bg-[#141417] border border-zinc-800 text-zinc-400 hover:text-white rounded-sm transition"
+                          className="p-1.5 bg-white/5 border border-white/10 text-zinc-400 hover:text-white rounded-lg transition"
                           title="Filter Options"
                         >
                           <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -953,7 +958,7 @@ export function App() {
 
                         <button
                           onClick={() => setShowCreateEventModal(true)}
-                          className="px-3 py-1.5 bg-white hover:bg-zinc-200 text-black text-[11px] font-bold rounded-sm flex items-center gap-1 transition shadow"
+                          className="px-3.5 py-1.5 bg-gradient-to-r from-[#00ffc8] to-[#00b4ff] text-black text-[11px] font-extrabold rounded-lg flex items-center gap-1 transition shadow-[0_4px_20px_rgba(0,255,200,0.3)] hover:scale-105"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           <span>Create Event</span>
