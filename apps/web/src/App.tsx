@@ -706,24 +706,24 @@ export function App() {
   ];
 
   return (
-    <div className="min-h-screen w-full bg-[#000000] text-zinc-100 flex flex-col font-sans selection:bg-zinc-800 selection:text-white">
+    <div className="min-h-screen w-full text-slate-800 flex flex-col font-sans selection:bg-blue-100 selection:text-blue-900">
       {!user ? (
         /* Compact Auth Screen */
-        <div className="max-w-md w-full mx-auto my-auto p-6 bg-[#121215] border border-zinc-800 rounded-2xl shadow-xl space-y-4">
+        <div className="max-w-md w-full mx-auto my-auto p-6 bg-white border border-slate-200 rounded-2xl shadow-xl space-y-4">
           <div className="text-center space-y-1">
-            <div className="w-10 h-10 mx-auto rounded-xl bg-zinc-900 border border-zinc-700 flex items-center justify-center text-white">
-              <Zap className="w-5 h-5 text-emerald-400" />
+            <div className="w-10 h-10 mx-auto rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-white">
+              <Zap className="w-5 h-5 text-blue-600" />
             </div>
-            <h2 className="text-xl font-bold text-white">EventOps Portal</h2>
-            <p className="text-xs text-zinc-400">Sign in to access your event dashboard</p>
+            <h2 className="text-xl font-bold text-slate-900">EventOps Portal</h2>
+            <p className="text-xs text-slate-500">Sign in to access your event dashboard</p>
           </div>
 
-          <div className="grid grid-cols-2 p-1 bg-zinc-950 rounded-xl border border-zinc-800 text-xs">
+          <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs">
             <button
               type="button"
               onClick={() => setAuthMode('login')}
               className={`py-1.5 font-bold rounded-lg transition ${
-                authMode === 'login' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
+                authMode === 'login' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               Sign In
@@ -732,42 +732,42 @@ export function App() {
               type="button"
               onClick={() => setAuthMode('register')}
               className={`py-1.5 font-bold rounded-lg transition ${
-                authMode === 'register' ? 'bg-white text-black' : 'text-zinc-400 hover:text-white'
+                authMode === 'register' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-800'
               }`}
             >
               Register
             </button>
           </div>
 
-          {authError && <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg text-rose-400 text-xs">{authError}</div>}
-          {authSuccess && <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-emerald-400 text-xs">{authSuccess}</div>}
+          {authError && <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-lg text-rose-700 text-xs">{authError}</div>}
+          {authSuccess && <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-lg text-emerald-700 text-xs">{authSuccess}</div>}
 
           {authMode === 'login' ? (
             <form onSubmit={handleLogin} className="space-y-3">
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Email</label>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700"
                 />
               </div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2 bg-white text-black font-bold text-xs rounded-lg hover:bg-zinc-200 transition"
+                className="w-full py-2 bg-gradient-to-r from-blue-700 to-sky-500 text-white font-bold text-xs rounded-lg hover:brightness-105 transition"
               >
                 {isSubmitting ? 'Signing in...' : 'Sign In'}
               </button>
@@ -775,39 +775,39 @@ export function App() {
           ) : (
             <form onSubmit={handleRegister} className="space-y-3">
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Full Name</label>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Full Name</label>
                 <input
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Email</label>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700"
                 />
               </div>
               <div>
-                <label className="block text-[11px] font-medium text-zinc-400 mb-1">Password</label>
+                <label className="block text-[11px] font-medium text-slate-500 mb-1">Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-3 py-2 bg-[#18181b] border border-zinc-800 rounded-lg text-xs text-white"
+                  className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs text-slate-700"
                 />
               </div>
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-2 bg-white text-black font-bold text-xs rounded-lg hover:bg-zinc-200 transition"
+                className="w-full py-2 bg-gradient-to-r from-blue-700 to-sky-500 text-white font-bold text-xs rounded-lg hover:brightness-105 transition"
               >
                 {isSubmitting ? 'Creating Account...' : 'Complete Registration'}
               </button>
@@ -820,7 +820,7 @@ export function App() {
               {/* Narrow 165px Sidebar */}
               {/* Narrow 165px Sidebar */}
               <aside
-                className={`fixed inset-y-0 left-0 z-30 w-[165px] bg-black/60 border-r border-white/10 p-3 flex flex-col justify-between shrink-0 backdrop-blur-xl transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
+                className={`fixed inset-y-0 left-0 z-30 w-[190px] bg-white/95 border-r border-slate-200 p-3 flex flex-col justify-between shrink-0 backdrop-blur-xl transform transition-transform duration-300 lg:relative lg:translate-x-0 ${
                   mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
                 }`}
               >
@@ -831,14 +831,14 @@ export function App() {
                       className="flex items-center space-x-2 cursor-pointer"
                       onClick={() => setActiveTab('events')}
                     >
-                      <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#7c3aed] to-[#00b4ff] shadow-[0_0_20px_rgba(124,58,237,0.4)] flex items-center justify-center text-white font-bold">
+                      <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-700 to-sky-500 shadow-md flex items-center justify-center text-white font-bold">
                         <Zap className="w-4 h-4 text-white" />
                       </div>
                       <span className="text-sm font-black tracking-tight gradient-text">EventOps</span>
                     </div>
                     <button
                       onClick={() => setMobileMenuOpen(false)}
-                      className="lg:hidden text-zinc-500 hover:text-zinc-300"
+                      className="lg:hidden text-slate-400 hover:text-slate-700"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -858,12 +858,12 @@ export function App() {
                           }}
                           className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-[11px] font-semibold transition-all duration-200 ${
                             isActive
-                              ? 'bg-gradient-to-r from-[#7c3aed] to-[#00b4ff] text-white shadow-[0_4px_20px_rgba(124,58,237,0.4)]'
-                              : 'text-zinc-400 hover:text-white hover:bg-white/10'
+                              ? 'bg-gradient-to-r from-blue-700 to-sky-500 text-white shadow-md'
+                              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'
                           }`}
                         >
                           <div className="flex items-center space-x-2 truncate">
-                            <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-zinc-400'}`} />
+                            <Icon className={`w-3.5 h-3.5 shrink-0 ${isActive ? 'text-white' : 'text-slate-400'}`} />
                             <span className="truncate">{item.label}</span>
                           </div>
                         </button>
@@ -874,22 +874,22 @@ export function App() {
 
                 {/* Sidebar User Profile Section */}
                 {user && (
-                  <div className="pt-3 border-t border-white/10">
-                    <div className="bg-white/[0.04] border border-white/10 rounded-lg p-2 flex items-center justify-between backdrop-blur-md">
+                  <div className="pt-3 border-t border-slate-200">
+                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-2 flex items-center justify-between">
                       <div className="flex items-center space-x-2 truncate">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#7c3aed] to-[#00ffc8] p-0.5 flex items-center justify-center text-[10px] font-bold text-black shrink-0 shadow-[0_0_10px_rgba(0,255,200,0.3)]">
-                          <div className="w-full h-full bg-[#050509] rounded-full flex items-center justify-center text-white">
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-700 to-sky-500 p-0.5 flex items-center justify-center text-[10px] font-bold text-black shrink-0 shadow-sm">
+                          <div className="w-full h-full bg-white rounded-full flex items-center justify-center text-slate-700">
                             {user.name.slice(0, 2).toUpperCase()}
                           </div>
                         </div>
                         <div className="truncate text-left">
-                          <div className="text-[11px] font-bold text-white truncate">{user.name}</div>
-                          <div className="text-[9px] text-zinc-400 truncate">{user.email}</div>
+                          <div className="text-[11px] font-bold text-slate-800 truncate">{user.name}</div>
+                          <div className="text-[9px] text-slate-500 truncate">{user.email}</div>
                         </div>
                       </div>
                       <button
                         onClick={handleLogout}
-                        className="p-1 text-zinc-400 hover:text-rose-400 rounded transition shrink-0"
+                        className="p-1 text-slate-400 hover:text-rose-500 rounded transition shrink-0"
                         title="Sign Out"
                       >
                         <LogOut className="w-3.5 h-3.5" />
@@ -909,12 +909,12 @@ export function App() {
 
                 <div className="p-5 space-y-5 flex-1">
                 {eventActionMsg && (
-                  <div className="p-3 bg-[#00ffc8]/10 border border-[#00ffc8]/30 rounded-xl text-[#00ffc8] text-xs flex justify-between items-center shadow-[0_0_15px_rgba(0,255,200,0.15)] backdrop-blur-md">
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700 text-xs flex justify-between items-center shadow-sm">
                     <div className="flex items-center space-x-2">
-                      <CheckCircle2 className="w-4 h-4 shrink-0 text-[#00ffc8]" />
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
                       <span>{eventActionMsg}</span>
                     </div>
-                    <button onClick={() => setEventActionMsg(null)} className="text-zinc-400 hover:text-white">
+                    <button onClick={() => setEventActionMsg(null)} className="text-slate-400 hover:text-slate-700">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -924,33 +924,33 @@ export function App() {
                 {activeTab === 'events' && (
                   <div className="space-y-5">
                     {/* Page Header & Filter Controls matching Vercel Portfolio Reference */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-gradient-to-b from-white/[0.05] to-white/[0.015] border border-white/10 p-4 rounded-xl backdrop-blur-md shadow-xl">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white border border-slate-200 p-4 rounded-xl shadow-sm">
                       <div>
-                        <h1 className="text-xl font-extrabold text-white tracking-tight gradient-text">
+                        <h1 className="text-xl font-extrabold text-slate-900 tracking-tight gradient-text">
                           Events &amp; VIP Tickets
                         </h1>
-                        <p className="text-[11px] text-zinc-400 mt-0.5">
+                        <p className="text-[11px] text-slate-500 mt-0.5">
                           Manage your event presence and discover new opportunities.
                         </p>
                       </div>
 
                       {/* Right Action Bar */}
                       <div className="flex flex-wrap items-center gap-1.5">
-                        <button className="px-3 py-1 bg-gradient-to-r from-[#7c3aed] to-[#00b4ff] text-white text-[11px] font-bold rounded-full shadow-[0_4px_15px_rgba(124,58,237,0.3)]">
+                        <button className="px-3 py-1 bg-gradient-to-r from-blue-700 to-sky-500 text-white text-[11px] font-bold rounded-full shadow-sm">
                           All
                         </button>
-                        <button className="px-3 py-1 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 rounded-full text-[11px] transition">
+                        <button className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 rounded-full text-[11px] transition">
                           Tech
                         </button>
-                        <button className="px-3 py-1 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 rounded-full text-[11px] transition">
+                        <button className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 rounded-full text-[11px] transition">
                           Workshop
                         </button>
-                        <button className="px-3 py-1 bg-white/5 hover:bg-white/10 text-zinc-300 border border-white/10 rounded-full text-[11px] transition">
+                        <button className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 rounded-full text-[11px] transition">
                           Hackathon
                         </button>
 
                         <button
-                          className="p-1.5 bg-white/5 border border-white/10 text-zinc-400 hover:text-white rounded-lg transition"
+                          className="p-1.5 bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-700 rounded-lg transition"
                           title="Filter Options"
                         >
                           <SlidersHorizontal className="w-3.5 h-3.5" />
@@ -958,7 +958,7 @@ export function App() {
 
                         <button
                           onClick={() => setShowCreateEventModal(true)}
-                          className="px-3.5 py-1.5 bg-gradient-to-r from-[#00ffc8] to-[#00b4ff] text-black text-[11px] font-extrabold rounded-lg flex items-center gap-1 transition shadow-[0_4px_20px_rgba(0,255,200,0.3)] hover:scale-105"
+                          className="px-3.5 py-1.5 bg-gradient-to-r from-blue-700 to-sky-500 text-white text-[11px] font-extrabold rounded-lg flex items-center gap-1 transition shadow-sm hover:brightness-105"
                         >
                           <Plus className="w-3.5 h-3.5" />
                           <span>Create Event</span>
@@ -974,22 +974,22 @@ export function App() {
                         return (
                           <div
                             key={ev.id}
-                            className="bg-[#0a0a0d] border border-zinc-800 rounded overflow-hidden flex flex-col justify-between group shadow-sm hover:border-zinc-700 transition"
+                            className="bg-white border border-slate-200 rounded-xl overflow-hidden flex flex-col justify-between group shadow-sm hover:border-blue-200 transition"
                           >
                             {/* Card Image Banner */}
-                            <div className="h-32 w-full relative overflow-hidden bg-gradient-to-br from-zinc-800 via-zinc-900 to-black border-b border-zinc-800 flex items-center justify-center">
-                              <Calendar className="w-8 h-8 text-zinc-700 opacity-40 group-hover:scale-105 transition duration-300" />
+                            <div className="h-32 w-full relative overflow-hidden bg-gradient-to-br from-blue-50 via-sky-50 to-indigo-50 border-b border-slate-200 flex items-center justify-center">
+                              <Calendar className="w-8 h-8 text-slate-400 opacity-70 group-hover:scale-105 transition duration-300" />
 
                               {/* Format Pill Overlay */}
                               <div className="absolute top-2 left-2 z-10">
-                                <span className="bg-black/70 backdrop-blur-md text-zinc-200 text-[9px] font-semibold px-2 py-0.5 rounded-sm border border-white/10">
+                                <span className="bg-white/90 text-slate-700 text-[9px] font-semibold px-2 py-0.5 rounded-sm border border-slate-200">
                                   {ev.format}
                                 </span>
                               </div>
 
                               {/* Action Menu Icon */}
                               <div className="absolute top-2 right-2 z-10">
-                                <button className="p-1 text-zinc-400 hover:text-white">
+                                <button className="p-1 text-slate-400 hover:text-slate-700">
                                   <MoreVertical className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -997,18 +997,18 @@ export function App() {
 
                             {/* Card Body */}
                             <div className="p-3 space-y-2">
-                              <div className="text-[9px] font-bold text-zinc-400 flex items-center gap-1 uppercase tracking-wider">
+                              <div className="text-[9px] font-bold text-slate-500 flex items-center gap-1 uppercase tracking-wider">
                                 <span>⚡</span>
                                 <span>{ev.category} Hub</span>
                               </div>
 
-                              <h3 className="text-xs font-bold text-white group-hover:text-emerald-400 transition line-clamp-1">
+                              <h3 className="text-xs font-bold text-slate-800 group-hover:text-blue-700 transition line-clamp-1">
                                 {ev.title}
                               </h3>
 
-                              <div className="space-y-1 text-[10px] text-zinc-400">
+                              <div className="space-y-1 text-[10px] text-slate-500">
                                 <div className="flex items-center gap-1.5">
-                                  <Clock className="w-3 h-3 text-zinc-500 shrink-0" />
+                                  <Clock className="w-3 h-3 text-slate-400 shrink-0" />
                                   <span>
                                     {startDate.toLocaleDateString('en-US', {
                                       month: 'short',
@@ -1019,14 +1019,14 @@ export function App() {
                                   </span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
-                                  <MapPin className="w-3 h-3 text-zinc-500 shrink-0" />
+                                  <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
                                   <span className="truncate">{ev.location || 'San Francisco, CA'}</span>
                                 </div>
                               </div>
 
                               {/* Capacity Progress Bar */}
                               <div className="space-y-1 pt-1">
-                                <div className="flex justify-between text-[9px] text-zinc-400 font-mono">
+                                <div className="flex justify-between text-[9px] text-slate-500 font-mono">
                                   <span>
                                     Capacity: {Math.round((ev.registered_count / ev.capacity) * 100)}%
                                   </span>
@@ -1034,9 +1034,9 @@ export function App() {
                                     {ev.registered_count}/{ev.capacity}
                                   </span>
                                 </div>
-                                <div className="w-full bg-zinc-800 h-1 rounded-full overflow-hidden">
+                                <div className="w-full bg-slate-200 h-1 rounded-full overflow-hidden">
                                   <div
-                                    className="bg-white h-full rounded-full transition-all duration-300"
+                                    className="bg-gradient-to-r from-blue-700 to-sky-500 h-full rounded-full transition-all duration-300"
                                     style={{
                                       width: `${Math.min(100, (ev.registered_count / ev.capacity) * 100)}%`,
                                     }}
@@ -1050,14 +1050,14 @@ export function App() {
                               {isPublished ? (
                                 <button
                                   onClick={() => handleRegisterEvent(ev.id)}
-                                  className="flex-1 py-1.5 bg-[#27272a] hover:bg-[#323238] text-zinc-200 hover:text-white font-semibold text-[11px] rounded-lg transition text-center"
+                                  className="flex-1 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-[11px] rounded-lg transition text-center"
                                 >
                                   RSVP Now
                                 </button>
                               ) : (
                                 <button
                                   onClick={() => handlePublishEvent(ev.id)}
-                                  className="flex-1 py-1.5 bg-emerald-500/20 text-emerald-300 font-semibold text-[11px] rounded-lg border border-emerald-500/30 hover:bg-emerald-500/30 transition text-center"
+                                  className="flex-1 py-1.5 bg-blue-100 text-blue-700 font-semibold text-[11px] rounded-lg border border-blue-200 hover:bg-blue-200 transition text-center"
                                 >
                                   Publish
                                 </button>
@@ -1068,14 +1068,14 @@ export function App() {
                                   setCheckInEventId(ev.id);
                                   setShowCheckInModal(true);
                                 }}
-                                className="p-1.5 bg-[#18181b] border border-zinc-800 text-zinc-400 hover:text-white rounded-lg transition"
+                                className="p-1.5 bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-700 rounded-lg transition"
                                 title="Check-In Entrance Scanner"
                               >
                                 <Ticket className="w-3.5 h-3.5" />
                               </button>
 
                               <button
-                                className="p-1.5 bg-[#18181b] border border-zinc-800 text-zinc-400 hover:text-white rounded-lg transition"
+                                className="p-1.5 bg-slate-100 border border-slate-200 text-slate-500 hover:text-slate-700 rounded-lg transition"
                                 title="Expand Details"
                               >
                                 <Maximize2 className="w-3.5 h-3.5" />
@@ -1090,15 +1090,15 @@ export function App() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
                       <div
                         onClick={() => setShowCreateEventModal(true)}
-                        className="bg-[#121215] border border-dashed border-zinc-800 hover:border-zinc-700 transition rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer min-h-[160px] group shadow-sm"
+                        className="bg-white border border-dashed border-slate-300 hover:border-blue-300 transition rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer min-h-[160px] group shadow-sm"
                       >
-                        <div className="w-8 h-8 rounded-full bg-zinc-800/80 border border-zinc-700 flex items-center justify-center text-zinc-300 group-hover:bg-white group-hover:text-black transition mb-2">
+                        <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-300 flex items-center justify-center text-slate-500 group-hover:bg-blue-600 group-hover:text-white transition mb-2">
                           <Plus className="w-4 h-4" />
                         </div>
-                        <h3 className="text-xs font-bold text-white group-hover:text-emerald-400 transition">
+                        <h3 className="text-xs font-bold text-slate-800 group-hover:text-blue-700 transition">
                           Host Your Own Event
                         </h3>
-                        <p className="text-[10px] text-zinc-500 mt-1 max-w-[150px] leading-snug">
+                        <p className="text-[10px] text-slate-500 mt-1 max-w-[150px] leading-snug">
                           Create workshops, hackathons, or tech summits with EventOps.
                         </p>
                       </div>
@@ -1106,15 +1106,15 @@ export function App() {
 
                     {/* Overlapping Persona Switcher Row at Center Bottom */}
                     <div className="pt-2 flex justify-center">
-                      <div className="inline-flex items-center space-x-[-6px] bg-[#121215] border border-zinc-800/80 px-3 py-1.5 rounded-full shadow">
-                        <span className="text-[10px] font-semibold text-zinc-400 mr-2">Switch Persona:</span>
+                      <div className="inline-flex items-center space-x-[-6px] bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
+                        <span className="text-[10px] font-semibold text-slate-500 mr-2">Switch Persona:</span>
                         {DEMO_ACCOUNTS.map((demo) => (
                           <button
                             key={demo.email}
                             type="button"
                             title={`${demo.name} (${demo.label})`}
                             onClick={() => handleQuickDemoSignIn(demo)}
-                            className="w-6 h-6 rounded-full border border-zinc-700 bg-zinc-800 text-[9px] font-bold text-zinc-200 hover:scale-110 hover:border-white transition flex items-center justify-center shadow"
+                            className="w-6 h-6 rounded-full border border-slate-300 bg-slate-100 text-[9px] font-bold text-slate-700 hover:scale-110 hover:border-blue-300 transition flex items-center justify-center shadow-sm"
                           >
                             {demo.name.slice(0, 1)}
                           </button>
@@ -1675,19 +1675,19 @@ export function App() {
         </div>
       )}
 
-      {/* Vintage Editorial Gazette Footer */}
-      <footer className="mt-16 py-8 border-t-2 border-double border-amber-500/40 glass-panel-deep relative z-10 text-center space-y-3 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-serif-vintage text-amber-300/80">
+      {/* Footer */}
+      <footer className="mt-16 py-8 border-t border-slate-200 glass-panel-deep relative z-10 text-center space-y-3 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-serif-vintage text-slate-500">
           <div className="flex items-center space-x-2">
-            <Flame className="w-4 h-4 text-amber-400" />
-            <span className="font-cinzel font-bold text-amber-100">THE EVENTOPS GAZETTE &amp; CHRONICLE</span>
-            <span className="vintage-stamp text-[9px] text-amber-400">ANNO MMXXVI</span>
+            <Flame className="w-4 h-4 text-blue-600" />
+            <span className="font-cinzel font-bold text-slate-700">EventOps Collaboration Suite</span>
+            <span className="vintage-stamp text-[9px] text-slate-400">2026</span>
           </div>
-          <div className="text-[11px] italic text-amber-400/60">
-            Published under the Seal of the Global Developer Guild &bull; Edition Vol. MMXXVI
+          <div className="text-[11px] italic text-slate-500">
+            Built for organizers, communities, and sponsors to run events together.
           </div>
-          <div className="flex items-center space-x-3 text-amber-300/70 font-mono text-[11px]">
-            <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-amber-400" /> Verified Cryptographic Identity</span>
+          <div className="flex items-center space-x-3 text-slate-500 font-mono text-[11px]">
+            <span className="flex items-center gap-1"><ShieldCheck className="w-3.5 h-3.5 text-blue-600" /> Verified Cryptographic Identity</span>
             <span>&bull;</span>
             <span>All Rights Reserved</span>
           </div>
